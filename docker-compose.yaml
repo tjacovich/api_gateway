@@ -2,9 +2,9 @@ version: '3.8'
 services:
   apigateway:
     build: .
-    command: bash -c "alembic upgrade head && python wsgi.py"
+    command: bash -c "alembic upgrade head && python3 wsgi.py"
     ports:
-      - "5000:8181"
+      - "4000:8181"
     depends_on:
       - db
       - redis
