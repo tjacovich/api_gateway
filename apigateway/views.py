@@ -35,7 +35,7 @@ from apigateway.utils import (
 class BootstrapView(Resource):
     def get(self):
         params = schemas.bootstrap_request.load(get_json_body(request))
-        current_app.logger.debug("Current user is {}".format(current_user))
+        current_app.logger.debug("Current user is authenticated: {}".format(current_user.is_authenticated))
         if not current_user.is_authenticated:
             bootstrap_user: User = User.query.filter_by(is_anonymous_bootstrap_user=True).first()
             if not bootstrap_user or not login_user(bootstrap_user):
