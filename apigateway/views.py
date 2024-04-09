@@ -113,7 +113,7 @@ class UserAuthView(Resource):
 
             user.last_login_at = datetime.now()
             user.login_count = user.login_count + 1 if user.login_count else 1
-
+            session.add(user)
             session.commit()
 
         return {"message": "Successfully logged in"}, 200
