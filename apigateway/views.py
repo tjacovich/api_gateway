@@ -111,7 +111,7 @@ class UserAuthView(Resource):
 
             login_user(user)
             current_app.logger.debug("Current user is {}".format(user.email))
-            current_app.logger.debug("Current user is authenticated: {}".format(current_user.is_authenticated()))
+            current_app.logger.debug("Current user is authenticated: {}".format(current_user.is_authenticated))
             user.last_login_at = datetime.now()
             user.login_count = user.login_count + 1 if user.login_count else 1
             session.add(user)
