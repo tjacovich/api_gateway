@@ -8,7 +8,7 @@ MAIL_DEFAULT_SENDER = "no-reply@adslabs.org"
 VERIFY_URL = "https://ui.adsabs.harvard.edu/#user/account/verify"
 
 SESSION_COOKIE_PATH = '/v1'
-
+APPLICATION_ROOT = '/'
 # Feeback
 FEEDBACK_FORMS_ORIGIN = "user_submission"
 BBB_FEEDBACK_ORIGIN = "bbb_feedback"
