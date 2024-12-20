@@ -1,0 +1,93 @@
+[project]
+name = "apigateway"
+version = "0.0.1"
+description = "Project description - replace"
+authors = [{ name = "Philip Matsson", email = "philip@winterway.eu" }]
+license = { text = "MIT" }
+readme = "README.md"
+repository = "https://github.com/adsabs/api_gateway"
+classifiers = [
+    "Development Status :: 2 - Pre-Alpha",
+    "Intended Audience :: Developers",
+    "Natural Language :: English",
+    "Operating System :: OS Independent",
+    "Topic :: Software Development :: Libraries",
+]
+
+packages = ["apigateway"]
+
+dependencies = [
+    'adsmutils@git+https://github.com/adsabs/ADSMicroserviceUtils.git@v1.3.0',
+    'authlib==1.2.1',
+    'alembic==1.12.0',
+    'flask-limiter==3.5.1',
+    'flask-marshmallow==0.14.0',
+    'flask-security-too==5.3.3',
+    'marshmallow-dataclass==8.6.0',
+    'marshmallow-sqlalchemy==0.28.2',
+    'portalocker==2.8.2',
+    'redis==5.0.1',
+    'sqlalchemy-utils==0.41.1',
+    'Flask-Caching==2.1.0',
+    'kafka-python==2.0.2',
+    'flask-cors==4.0.0',
+    'flask-talisman==1.1.0',
+    'jsondiff==2.0.0',
+    'sqlalchemy-citext==1.8.0'
+]
+
+[project.urls]
+Source = "https://github.com/adsabs/api_gateway"
+
+[project.optional-dependencies]
+dev = [
+    'black==22.3.0',
+    'flake8==4.0.1',
+    'isort==5.12.0',
+    'pytest==6.2.5',
+    'pyupgrade==2.29.1',
+    'pytest-mock==3.6.1',
+    'pre-commit==2.16.0',
+    'coveralls==3.3.1',
+    'mock==4.0.3',
+    'coverage==6.2',
+    'pytest-cov==3.0.0',
+    'pytest-cookies==0.6.1',
+]
+
+[tool.pytest.ini_options]
+addopts = "-v -Wdefault --cov=apigateway"
+cache_dir = ".tmp/"
+testpaths = ["apigateway/tests"]
+
+[tool.coverage.run]
+data_file = ".tmp/.coverage"
+source = ["apigateway/"]
+omit = ["*tests*", "*migrations*"]
+
+[tool.coverage.report]
+skip_empty = true
+skip_covered = true
+
+[tool.isort]
+profile = "black"
+known_first_party = ["apigateway", "tests"]
+
+[tool.black]
+line-length = 99 # override black's default line-length
+
+[build-system]
+requires = [
+    "setuptools",
+    "wheel",
+    "flit_core >=3.2,<4",
+    "ppsetuptools==2.0.2"
+]
+build-backend = "flit_core.buildapi"
+#build-backend = "setuptools.build_meta"
+
+# see setup.py for explanation of these
+[xsetup.entry_points]
+console_scripts = ["adsingestp=adsingestp.cli:cli"]
+[xsetup]
+scripts = []
