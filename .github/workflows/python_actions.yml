@@ -1,0 +1,85 @@
+name: Python CI actions
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+env:
+  PGDATABASE: gateway
+  PGPASSWORD: password
+  PGUSER: user
+  PGHOST: localhost
+  PGPORT: 5432
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: "3.8"
+      - uses: pre-commit/action@v2.0.3
+  build:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:14.4
+        env:
+          POSTGRES_DB: gateway
+          POSTGRES_PASSWORD: password
+          POSTGRES_USER: user
+          POSTGRES_HOST: localhost
+          POSTGRES_PORT: 5432
+
+        ports:
+          - 5432:5432
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis
+        env:
+          REDIS_HOST: localhost
+          REDIS_PORT: 6379
+        ports:
+          - 6379:6379
+        # Set health checks to wait until redis has started
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+
+
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+
+    - name: Install dependencies
+      run: |
+        pip install .
+        pip install -e '.[dev]'
+
+    - name: Initialize postgres
+      working-directory: apigateway
+      run: |
+        alembic upgrade head
+
+    - name: Test with pytest
+      run: |
+        pytest
+
+    - name: Coveralls
+      run: coveralls
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
