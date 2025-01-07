@@ -1,3 +1,4 @@
+[![Coverage Status](https://coveralls.io/repos/github/adsabs/api_gateway/badge.svg?branch=fix-github-action)](https://coveralls.io/github/adsabs/api_gateway?branch=fix-github-action)
 # api_gateway
 
 SciX API Gateway, the core API module for SciX

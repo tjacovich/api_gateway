@@ -175,12 +175,14 @@ class TestProxyService:
                 endpoint="/test/example",
                 view_func=mock_auth_service.require_oauth()(),
                 methods=["OPTIONS", "GET", "HEAD"],
+                provide_automatic_options=True,
             ),
             call(
                 "/test2/example",
                 endpoint="/test2/example",
                 view_func=mock_auth_service.require_oauth()(),
                 methods=["OPTIONS", "GET", "HEAD"],
+                provide_automatic_options=True,
             ),
         ]
         mock_add_url_rule.assert_has_calls(calls, any_order=True)
