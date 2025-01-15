@@ -208,7 +208,7 @@ class ProxyView(View):
             remote_url = self._construct_remote_url()
             http_method_func = getattr(self._session, request.method.lower())
 
-            current_app.logger.debug(
+            current_app.logger.info(
                 "Proxying %s request to %s", request.method.upper(), remote_url
             )
 
@@ -218,6 +218,9 @@ class ProxyView(View):
 
             return response.content, response.status_code, dict(response.headers)
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
+            current_app.logger.info(
+                "Gateway Timeout with %s request to %s", request.method.upper(), remote_url
+            )
             return b"504 Gateway Timeout", 504
 
     def _construct_remote_url(self) -> str:

@@ -125,8 +125,13 @@ class UserAuthView(Resource):
             try:
                 schemas.PasswordValidator()(params.password)
             except:  # noqa
-                token: str = extensions.security_service.generate_password_token()
+                current_app.logger.info("Forcing generation of password reset token for user: {}".format(user.id))
+                token: str = extensions.security_service.generate_password_token(user.id)
+                self._delete_existing_password_change_requests(session, user.id)
+                self._create_password_change_request(session, token, user.id)
                 send_password_reset_email(token, user.email)
+                
+                current_app.logger.info("Forcing password reset for user {}".format(user.email))
 
                 abort(
                     422,
@@ -147,7 +152,17 @@ class UserAuthView(Resource):
             session.commit()
 
         return {"message": "Successfully logged in"}, 200
+    
+    def _delete_existing_password_change_requests(self, session, user_id: int):
+        session.query(PasswordChangeRequest).filter(
+            PasswordChangeRequest.user_id == user_id
+        ).delete()
 
+    def _create_password_change_request(self, session, token: str, user_id: int):
+        password_change_request = PasswordChangeRequest(token=token, user_id=user_id)
+
+        session.add(password_change_request)
+        session.commit()
 
 class CSRFView(Resource):
     """
@@ -213,7 +228,7 @@ class UserManagementView(Resource):
 
             token = extensions.security_service.generate_email_token(user.id)
             send_welcome_email(token, user.email)
-
+            current_app.logger.info("Sent Welcome email for user: {}".format(user.email))
             return {"message": "success"}, 200
         except ValueError as e:
             return {"error": str(e)}, 400
@@ -289,6 +304,7 @@ class ResetPasswordView(Resource):
                 self._delete_existing_password_change_requests(session, user.id)
                 self._create_password_change_request(session, token, user.id)
 
+                current_app.logger.info("Sent password reset email for user: {}".format(token_or_email))
                 send_password_reset_email(token, token_or_email)
 
             return {"message": "success"}, 200
@@ -497,7 +513,7 @@ class UserInfoView(Resource):
     """
 
     decorators = [
-        extensions.limiter_service.shared_limit("500/43200 second"),
+        #extensions.limiter_service.shared_limit("500/43200 second"),
         extensions.auth_service.require_oauth("adsws:internal"),
     ]
 
@@ -517,7 +533,7 @@ class UserInfoView(Resource):
         ## Input data can be a session, a access token or a user id
         # 1) Try to treat input data as a session
         try:
-            session_data = self._decodeFlaskCookie(account_data)
+            session_data = self._decodeFlaskCookie(account_data)      
             if "oauth_client" in session_data:
                 # Anonymous users always have their oauth_client id in the session
                 token = OAuth2Token.query.filter(
@@ -604,7 +620,7 @@ class UserInfoView(Resource):
             hashlib.pbkdf2_hmac(
                 "sha256",
                 str(id).encode(),
-                current_app.secret_key.encode(),
+                str(current_app.secret_key).encode(),
                 10,
                 dklen=32,
             )

@@ -4,7 +4,7 @@ from authlib.integrations.sqla_oauth2 import (
     create_query_client_func,
     create_save_token_func,
 )
-from flask import Flask, abort, jsonify, request, session
+from flask import Flask, abort, jsonify, request, session, current_app
 from flask_restful import Api
 from marshmallow import ValidationError as MarshmallowValidationError
 
@@ -72,6 +72,29 @@ def register_hooks(app: Flask):
         This overrides the default behavior or re-directing to a login view
         """
         abort(401)
+    
+    @app.teardown_request
+    def teardown_request(exception=None):
+        """This function will close active transaction, if there is one
+        but only if the session is not dirty - we don't want to do any
+        magic (instead of a developer)
+        
+        use expire_on_commit=False doesn't have the same effect
+        http://docs.sqlalchemy.org/en/latest/orm/session_api.html#sqlalchemy.orm.session.Session.commit
+        
+        The problems we are facing is that a new transaction gets opened
+        when session is committed; consequent access to the ORM objects
+        opens a new transaction (which never gets closed and is rolled back)
+        """
+        a = current_app
+        if 'sqlalchemy' in a.extensions: # could use self.db but let's be very careful
+            sa = a.extensions['sqlalchemy']
+            if hasattr(sa, 'db') and hasattr(sa.db, 'session') and sa.db.session.is_active:
+                if bool(sa.db.session.dirty):
+                    sa.db.session.close() # db server will do rollback
+                else:
+                    sa.db.session.commit() # normal situation        
+    return app
 
 
 def register_error_handlers(app: Flask):

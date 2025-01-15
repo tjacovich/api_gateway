@@ -15,7 +15,7 @@ import requests
 from authlib.integrations.flask_oauth2 import current_token, token_authenticated
 from authlib.integrations.sqla_oauth2 import create_bearer_token_validator
 from cachelib.serializers import RedisSerializer
-from flask import Flask, g, request
+from flask import Flask, g, request, current_app
 from flask.wrappers import Response
 from flask_caching import Cache
 from flask_limiter import Limiter
@@ -427,9 +427,9 @@ class ProxyService(GatewayService):
             self._logger.error("Could not fetch resource document for %s: %s", base_url, ex)
             return
 
-        self._logger.debug("Discovered %s endpoints:", deploy_path)
+        self._logger.info("Discovered %s endpoints:", deploy_path)
         for remote_path, properties in resource_json.items():
-            self._logger.debug("- %s", remote_path)
+            self._logger.info("- %s", remote_path)
 
             properties.setdefault(
                 "rate_limit",
@@ -506,7 +506,7 @@ class ProxyService(GatewayService):
             return response.json()
         except requests.exceptions.RequestException as ex:
             if extensions.storage_service.has(resource_url):
-                self._logger.debug("Using cached resource document for %s", resource_url)
+                self._logger.info("Using cached resource document for %s", resource_url)
                 return extensions.storage_service.get(resource_url)
             else:
                 raise ex
@@ -657,7 +657,7 @@ class LimiterService(GatewayService, Limiter):
                         "per_second": values.get("per_second", per_second),
                     }
 
-                self._logger.debug(f'"{endpoint}" added to limiter group "{group}"')
+                self._logger.info(f'"{endpoint}" added to limiter group "{group}"')
                 self._symbolic_ratelimits[endpoint] = self._symbolic_ratelimits[group]
                 break
 
@@ -765,7 +765,7 @@ class LimiterService(GatewayService, Limiter):
             extensions.storage_service.get(f"{self._name}//{self._key_func()}/time") or 0
         )
 
-        return 1 if processing_time_seconds <= 1 else int(2 ** (processing_time_seconds - 1))
+        return 1 #if processing_time_seconds <= 1 else int(2 ** (processing_time_seconds - 1))
 
     def _key_func(self, request_endpoint=None) -> str:
         """Returns the key for the rate limit.
@@ -1279,6 +1279,7 @@ class SecurityService(GatewayService, Security):
 
         if user_id is None:
             user_id = current_user.id
+        current_app.logger.info("Generating password token for user: {}".format(user_id))
 
         return self.generate_token(user_id, salt=self.get_service_config("VERIFY_PASSWORD_SALT"))
 
@@ -1339,7 +1340,7 @@ class SecurityService(GatewayService, Security):
                 "{0} verification token not validated. Reason: {1}".format(token, ex)
             )
             raise ValueError("unknown verification token")
-
+        current_app.logger.info("Verifying token for user: {}".format(user_id))
         user: User = User.query.filter_by(id=user_id).first()
 
         if user is None:
