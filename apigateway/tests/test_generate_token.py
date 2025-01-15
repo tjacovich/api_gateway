@@ -91,7 +91,7 @@ def test_create_client_and_metadata(mock_add_arguments, app, mock_regular_user, 
         created_client = mock_add.call_args[0][0]
         
         # Assert that the created client's attributes correspond to the args
-        assert created_client.user_id == mock_regular_user.id
+        assert created_client.user_id == mock_regular_user.get_id()
         assert created_client.ratelimit_multiplier == 1.0
         assert created_client.individual_ratelimit_multipliers is None
         assert created_client.client_metadata["client_name"] == mock_add_arguments.return_value.name
@@ -103,7 +103,7 @@ def test_create_client_and_metadata(mock_add_arguments, app, mock_regular_user, 
         mock_commit.assert_called_once()
 
 def test_get_token_no_tokens_found(mock_add_arguments, app, mock_regular_user, mock_client, mock_simple_token):
-    mock_simple_token.scopes = ["fake_scope_1", "fake_scope_2"]
+    mock_simple_token.scope = "fake_scope_1 fake_scope_2"
     with patch("apigateway.extensions.db.session.query") as mock_query, \
          patch("apigateway.extensions.db.session.add") as mock_add,  \
          patch("apigateway.extensions.db.session.commit") as mock_commit:
@@ -124,8 +124,8 @@ def test_get_token_no_tokens_found(mock_add_arguments, app, mock_regular_user, m
         mock_add.assert_called()
         mock_commit.assert_called()
 
-        assert created_token.user_id == mock_regular_user.id
-        assert created_token.client_id == mock_client.client_id
+        assert created_token.user_id == mock_regular_user.get_id()
+        assert created_token.client_id == mock_client.id
         assert created_token.scope == mock_client.scope
         assert created_token.is_personal == mock_add_arguments.return_value.is_personal 
         assert created_token.is_internal == True 

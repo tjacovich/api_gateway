@@ -181,5 +181,5 @@ def mock_simple_token():
     mock_token = MagicMock()
     mock_token.access_token = "access_token"
     mock_token.refresh_token = "refresh_token"
-    mock_token.scopes = ["user", "api"]
+    mock_token.scope = "user api"
     return mock_token

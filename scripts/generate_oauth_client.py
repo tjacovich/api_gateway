@@ -18,6 +18,8 @@ from apigateway.models import (
     User,
 )
 
+import uuid
+
 class DatabaseIntegrityError(Exception):
   
   def __init__(self,value="Multiple entries found for what should have been a unique query. This suggests that the database is not in a correct state!"):
@@ -91,7 +93,7 @@ def get_token():
            
             if not args.create_user:
                 sys.exit(f"User with email {args.user_email} not found, and --create-user was not specified. Exiting.")
-            u = User(email=args.user_email, active=True)
+            u = User(email=args.user_email, active=True, fs_uniquifier=uuid.uuid4().hex)
             db.session.add(u)
             db.session.commit()
         except MultipleResultsFound:
@@ -100,13 +102,13 @@ def get_token():
         
         
         try:
-            client = db.session.query(OAuth2Client).filter_by(user_id=u.id, name=args.name).one()
+            client = db.session.query(OAuth2Client).filter_by(user_id=u.get_id(), name=args.name).one()
         except MultipleResultsFound:
             raise DatabaseIntegrityError("Multiple oauthclients found for that user and name.")
         except NoResultFound:
             
             client = OAuth2Client(
-                        user_id=u.id,
+                        user_id=u.get_id(),
                         ratelimit_multiplier=1.0,
                         individual_ratelimit_multipliers=None,
                         last_activity=datetime.datetime.now(),
@@ -125,14 +127,14 @@ def get_token():
 
         try:
             tokens = db.session.query(OAuth2Token).filter_by(
-                client_id=client.client_id,
-                user_id=u.id,
+                client_id=client.id,
+                user_id=u.get_id(),
                 is_personal=args.is_personal).all()
             
             # Iterate through each result and compare scopes
             matching_tokens = []
             for token in tokens:
-                if set(args.scopes) == set(token.scopes):
+                if set(args.scopes) == set(token.scope.split()):
                     matching_tokens.append(token)
             if not matching_tokens:
                 raise NoResultFound
@@ -145,8 +147,8 @@ def get_token():
             expires = datetime.datetime(2050,1,1)
             token = OAuth2Token(
                 token_type="Bearer",
-                user_id=u.id,
-                client_id=client.client_id,
+                user_id=u.get_id(),
+                client_id=client.id,
                 access_token=gen_salt(salt_length),
                 refresh_token=gen_salt(salt_length),
                 scope=client.scope,
