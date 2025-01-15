@@ -215,7 +215,7 @@ class AuthService(GatewayService):
 
             client.gen_salt()
             extensions.db.session.add(client)
-            extensions.db.session.commit()
+            extensions.db.session.flush()
 
             token = self._create_user_token(client, expires=expires)
             extensions.db.session.add(token)
@@ -267,7 +267,7 @@ class AuthService(GatewayService):
 
         client.gen_salt()
         extensions.db.session.add(client)
-        extensions.db.session.commit()
+        extensions.db.session.flush()
 
         token = self._create_temporary_token(client)
         extensions.db.session.add(token)

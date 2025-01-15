@@ -104,7 +104,9 @@ class OAuth2Client(base_model, OAuth2ClientMixin):
     __tablename__ = "oauth2client"
 
     id = sa.Column(sa.Integer, primary_key=True, autoincrement=True)
-    user_id = sa.Column(sa.String, sa.ForeignKey("user.fs_uniquifier", ondelete="CASCADE"))
+    user_id = sa.Column(
+        sa.String, sa.ForeignKey("user.fs_uniquifier", ondelete="CASCADE"), index=True
+    )
     ratelimit_multiplier = sa.Column(sa.Float, default=1.0)
     individual_ratelimit_multipliers = sa.Column(sa.JSON)
     last_activity = sa.Column(sa.DateTime, nullable=True)
@@ -126,11 +128,15 @@ class OAuth2Token(base_model, OAuth2TokenMixin):
     __tablename__ = "oauth2token"
 
     id = sa.Column(sa.Integer, primary_key=True, autoincrement=True)
-    user_id = sa.Column(sa.String, sa.ForeignKey("user.fs_uniquifier", ondelete="CASCADE"))
+    user_id = sa.Column(
+        sa.String, sa.ForeignKey("user.fs_uniquifier", ondelete="CASCADE"), index=True
+    )
     user = relationship("User")
-    client_id = sa.Column(sa.Integer(), sa.ForeignKey("oauth2client.id", ondelete="CASCADE"))
+    client_id = sa.Column(
+        sa.Integer(), sa.ForeignKey("oauth2client.id", ondelete="CASCADE"), index=True
+    )
     client = relationship("OAuth2Client")
-    is_personal = sa.Column(sa.Boolean, default=False)
+    is_personal = sa.Column(sa.Boolean, default=False, index=True)
     is_internal = sa.Column(sa.Boolean, default=False)
     expires_in = sa.Column(sa.BigInteger, nullable=False, default=0)
 
