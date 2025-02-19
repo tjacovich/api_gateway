@@ -21,6 +21,7 @@ def app(request):
             "PROXY_SERVICE_WEBSERVICES": {},
             "BOOTSTRAP_TOKEN_EXPIRES": 3600,
             "PROXY_SERVICE_ALLOWED_HEADERS": ["test_allowed_header"],
+            "LIMITER_SERVICE_SCALING_COST_ENABLED": False,
         },
         name=request.node.name,
     )
@@ -176,8 +177,9 @@ def mock_add_arguments():
         mock_args.return_value.is_personal = False
         yield mock_args
 
+
 @pytest.fixture()
-def mock_simple_token(): 
+def mock_simple_token():
     mock_token = MagicMock()
     mock_token.access_token = "access_token"
     mock_token.refresh_token = "refresh_token"
