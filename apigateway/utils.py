@@ -48,6 +48,14 @@ def send_email(
         )
         return
 
+    if request.headers.get("HOST", "").endswith("-shadow"):
+        current_app.logger.info(
+            "Email was NOT sent to '{}' with verification URL '{}' due to HOST ending with -shadow".format(
+                recipient, verification_url
+            )
+        )
+        return
+
     if not mail_server:
         mail_server = current_app.config.get("MAIL_SERVER", "localhost")
 
