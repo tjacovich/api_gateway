@@ -2,7 +2,7 @@
 __pycache__/
 *.py[cod]
 *$py.class
-
+scripts/test_core_and_bootstrap.py
 # C extensions
 *.so
 
