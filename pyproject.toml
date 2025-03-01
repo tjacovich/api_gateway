@@ -86,6 +86,9 @@ requires = [
 build-backend = "flit_core.buildapi"
 #build-backend = "setuptools.build_meta"
 
+[project.scripts]
+apigateway = "apigateway.cli:cli"
+
 # see setup.py for explanation of these
 [xsetup.entry_points]
 console_scripts = ["adsingestp=adsingestp.cli:cli"]
