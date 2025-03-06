@@ -11,6 +11,19 @@ from marshmallow import ValidationError as MarshmallowValidationError
 from apigateway import exceptions, extensions, views
 from apigateway.models import OAuth2Client, OAuth2Token, User
 
+from opentelemetry.sdk.resources import SERVICE_NAME, Resource
+
+from opentelemetry import trace
+from opentelemetry.sdk.trace import TracerProvider
+from opentelemetry.sdk.trace.export import BatchSpanProcessor, ConsoleSpanExporter
+
+from opentelemetry import metrics
+from opentelemetry.sdk.metrics import MeterProvider
+from opentelemetry.sdk.metrics.export import PeriodicExportingMetricReader, ConsoleMetricExporter
+
+
+from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
+from opentelemetry.exporter.otlp.proto.http.metric_exporter import OTLPMetricExporter
 
 def register_extensions(app: Flask):
     """Register extensions.
@@ -223,6 +236,37 @@ def create_app(**config):
             app.logger.warning("Converted SECRET_KEY from hex format into bytes")
         except ValueError:
             app.logger.warning("Most likely the SECRET_KEY is not in hex format")
+
+    # Service name is required for most backends,
+    # and although it's not necessary for console export,
+    # it's good to set service name anyways.
+    if app.config.get('ENABLE_OTEL', False):
+        resource = Resource(attributes={
+            SERVICE_NAME: app.config.get('OTEL_SERVICE_NAME')
+        })
+        if app.config.get('ENABLE_OTEL') == 'EXPORTER':
+            tracerProvider = TracerProvider(resource=resource)
+            processor = BatchSpanProcessor(OTLPSpanExporter(endpoint=app.config.get('OTEL_TRACES_ENDPOINT','http://localhost:4318/v1/traces')))
+            tracerProvider.add_span_processor(processor)
+            trace.set_tracer_provider(tracerProvider)
+
+            if app.config.get('OTEL_ENABLE_METRICS'):
+                reader = PeriodicExportingMetricReader(
+                    OTLPMetricExporter(endpoint=app.config.get('OTEL_METRICS_ENDPOINT', 'http://localhost:9091/v1/metrics'))
+                )
+                meterProvider = MeterProvider(resource=resource, metric_readers=[reader])
+                metrics.set_meter_provider(meterProvider)
+
+        elif app.config.get('ENABLE_OTEL') == 'CONSOLE':
+            tracerProvider = TracerProvider(resource=resource)
+            processor = BatchSpanProcessor(ConsoleSpanExporter())
+            tracerProvider.add_span_processor(processor)
+            trace.set_tracer_provider(tracerProvider)
+            
+            if app.config.get('OTEL_ENABLE_METRICS'):
+                reader = PeriodicExportingMetricReader(ConsoleMetricExporter())
+                meterProvider = MeterProvider(resource=resource, metric_readers=[reader])
+                metrics.set_meter_provider(meterProvider)
 
     flask_api = Api(app)
     register_verbose_exception_logging(app)
