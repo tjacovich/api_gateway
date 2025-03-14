@@ -12,6 +12,7 @@ from flask import Request, current_app, request
 from flask.views import View
 from flask_login import current_user
 
+from apigateway import extensions
 from apigateway.email_templates import (
     AccountRegistrationAttemptEmail,
     EmailTemplate,
@@ -203,6 +204,11 @@ class ProxyView(View):
         Returns:
             Tuple[bytes, int]: A tuple containing the content of the response and the status code.
         """
+
+        # flask_principal holds an active DB session.
+        # Release the session early to avoid blocking during long running requests to external endpoints.
+        extensions.db.session.remove()
+
         return self._proxy_request()
 
     def _proxy_request(self) -> Tuple[bytes, int]:

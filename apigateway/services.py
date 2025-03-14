@@ -1,4 +1,4 @@
-""" Module defining API Gateway services. """
+"""Module defining API Gateway services."""
 
 import hashlib
 import json
@@ -99,7 +99,7 @@ class AuthService(GatewayService):
             app (Flask): The Flask app to initialize the AuthService with.
         """
         super().init_app(app)
-        bearer_cls = create_bearer_token_validator(app.db.session, OAuth2Token)
+        bearer_cls = create_bearer_token_validator(extensions.db.session, OAuth2Token)
         self.require_oauth.register_token_validator(bearer_cls())
         self._register_hooks(app)
 
@@ -1161,7 +1161,7 @@ class SecurityService(GatewayService, Security):
         Security.init_app(
             self,
             app,
-            datastore=SQLAlchemyUserDatastore(app.db, User, Role),
+            datastore=SQLAlchemyUserDatastore(extensions.db, User, Role),
             anonymous_user=AnonymousUser,
         )
 
