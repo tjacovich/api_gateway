@@ -16,7 +16,7 @@ from sqlalchemy import or_
 from werkzeug.security import gen_salt
 
 from apigateway import email_templates as templates
-from apigateway import extensions, schemas, exceptions
+from apigateway import exceptions, extensions, schemas
 from apigateway.models import (
     EmailChangeRequest,
     OAuth2Client,
@@ -125,12 +125,14 @@ class UserAuthView(Resource):
             try:
                 schemas.PasswordValidator()(params.password)
             except:  # noqa
-                current_app.logger.info("Forcing generation of password reset token for user: {}".format(user.id))
+                current_app.logger.info(
+                    "Forcing generation of password reset token for user: {}".format(user.id)
+                )
                 token: str = extensions.security_service.generate_password_token(user.id)
                 self._delete_existing_password_change_requests(session, user.id)
                 self._create_password_change_request(session, token, user.id)
                 send_password_reset_email(token, user.email)
-                
+
                 current_app.logger.info("Forcing password reset for user {}".format(user.email))
 
                 abort(
@@ -152,7 +154,7 @@ class UserAuthView(Resource):
             session.commit()
 
         return {"message": "Successfully logged in"}, 200
-    
+
     def _delete_existing_password_change_requests(self, session, user_id: int):
         session.query(PasswordChangeRequest).filter(
             PasswordChangeRequest.user_id == user_id
@@ -163,6 +165,7 @@ class UserAuthView(Resource):
 
         session.add(password_change_request)
         session.commit()
+
 
 class CSRFView(Resource):
     """
@@ -304,7 +307,9 @@ class ResetPasswordView(Resource):
                 self._delete_existing_password_change_requests(session, user.id)
                 self._create_password_change_request(session, token, user.id)
 
-                current_app.logger.info("Sent password reset email for user: {}".format(token_or_email))
+                current_app.logger.info(
+                    "Sent password reset email for user: {}".format(token_or_email)
+                )
                 send_password_reset_email(token, token_or_email)
 
             return {"message": "success"}, 200
@@ -513,7 +518,7 @@ class UserInfoView(Resource):
     """
 
     decorators = [
-        #extensions.limiter_service.shared_limit("500/43200 second"),
+        # extensions.limiter_service.shared_limit("500/43200 second"),
         extensions.auth_service.require_oauth("adsws:internal"),
     ]
 
@@ -533,12 +538,14 @@ class UserInfoView(Resource):
         ## Input data can be a session, a access token or a user id
         # 1) Try to treat input data as a session
         try:
-            session_data = self._decodeFlaskCookie(account_data)      
+            session_data = self._decodeFlaskCookie(account_data)
             if "oauth_client" in session_data:
                 # Anonymous users always have their oauth_client id in the session
-                token = OAuth2Token.query.filter(
-                    OAuth2Client.client_id == session_data["oauth_client"]
-                ).first()
+                token = (
+                    OAuth2Token.query.join(OAuth2Client)
+                    .filter(OAuth2Client.client_id == session_data["oauth_client"])
+                    .first()
+                )
                 if token:
                     return self._translate(token, source="session:client_id")
                 else:
@@ -581,7 +588,11 @@ class UserInfoView(Resource):
             return self._translate(token, source="access_token")
 
         # 3) Try to treat input data as client id
-        token = OAuth2Token.query.filter(OAuth2Client.client_id == account_data).first()
+        token = (
+            OAuth2Token.query.join(OAuth2Client)
+            .filter(OAuth2Client.client_id == account_data)
+            .first()
+        )
         if token:
             return self._translate(token, source="client_id")
 
