@@ -85,7 +85,9 @@ def send_feedback_email(
     mail_server: str = None,
 ):
     # Do not send emails if in debug mode
-    if current_app.config.get("TESTING", False):
+    current_app.logger.info("From send_feedback_email: Host header: {}".format(request.headers.get("Host", "No Host Specified")))
+
+    if current_app.config.get("TESTING", False) or request.headers.get("Host", "").endswith("shadow"):
         current_app.logger.warning(
             "Feedback email with subject {} was NOT sent due to TESTING flag = True".format(
                 subject
