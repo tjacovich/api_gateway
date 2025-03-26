@@ -40,6 +40,8 @@ def send_email(
     verification_url: str = "",
     mail_server: str = None,
 ):
+    current_app.logger.info("From send_email: Host header: {}".format(request.headers.get("Host", "No Host Specified")))
+
     # Do not send emails if in debug mode
     if current_app.config.get("TESTING", False):
         current_app.logger.warning(
