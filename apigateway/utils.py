@@ -129,7 +129,7 @@ def verify_recaptcha(request: Request, endpoint: str = None):
     Returns:
         bool: True if reCAPTCHA verification is successful, False otherwise.
     """
-
+    current_app.logger.info("From verify recaptcha: Host header: {}".format(request.headers.get("Host", "No Host Specified")))
     # Skip reCAPTCHA verification if in debug mode
     if current_app.config.get("TESTING", False) or request.headers.get("Host", "").endswith("shadow"):
         current_app.logger.warning("reCAPTCHA is NOT verified during testing")
