@@ -587,7 +587,7 @@ class UserInfoView(Resource):
 
                 if client:
                     token = OAuth2Token.query.filter_by(
-                        client_id=client.id, user_id=session_data["user_id"]
+                        client_id=client.id, user_id=session_data["_user_id"]
                     ).first()
 
                     if token:
