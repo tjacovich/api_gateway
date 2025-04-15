@@ -118,7 +118,10 @@ def send_feedback_email(
             )
 
     with smtplib.SMTP(mail_server) as s:
-        s.send_message(message)
+        try:
+            s.send_message(message)
+        except Exception:
+            current_app.logger.exception("Failed to send message for Feedback email from: {}".format(submitter_email))
 
 
 def verify_recaptcha(request: Request, endpoint: str = None):
