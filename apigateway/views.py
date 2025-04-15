@@ -728,6 +728,7 @@ class UserFeedbackView(Resource):
             )
             return True
         except:  # noqa
+            current_app.logger.exception("Failed to send feedback email from user: {}".format(submitter_email))
             return False
 
     def _post_to_slack(self, slack_data):
