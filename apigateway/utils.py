@@ -112,7 +112,7 @@ def send_feedback_email(
         for attachment in attachments:
             message.add_attachment(
                 json.dumps(attachment[1]).encode('utf-8'),
-                filename=attachment[0],
+                filename=attachment[0].strip('.txt')+str('.json'),
                 maintype="application",
                 subtype="json",
             )
