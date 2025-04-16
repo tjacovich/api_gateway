@@ -3,6 +3,10 @@ services:
   apigateway:
     build: .
     command: bash -c "alembic upgrade head && python wsgi.py"
+    environment:
+      OTEL_SERVICE_NAME: api-gateway
+      ENABLE_OTEL: 'EXPORTER'
+
     ports:
       - "5000:8181"
     depends_on:

@@ -33,7 +33,13 @@ dependencies = [
     'flask-cors==4.0.0',
     'flask-talisman==1.1.0',
     'jsondiff==2.0.0',
-    'sqlalchemy-citext==1.8.0'
+    'sqlalchemy-citext==1.8.0',
+    'opentelemetry-instrumentation-flask==0.51b0',
+    'opentelemetry-sdk==1.30.0',
+    'opentelemetry-exporter-otlp==1.30.0',
+    'opentelemetry-instrumentation-sqlalchemy==0.51b0'
+
+
 ]
 
 [project.urls]

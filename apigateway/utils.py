@@ -40,6 +40,8 @@ def send_email(
     verification_url: str = "",
     mail_server: str = None,
 ):
+    current_app.logger.info("From send_email: Host header: {}".format(request.headers.get("Host", "No Host Specified")))
+
     # Do not send emails if in debug mode
     if current_app.config.get("TESTING", False):
         current_app.logger.warning(
@@ -83,7 +85,9 @@ def send_feedback_email(
     mail_server: str = None,
 ):
     # Do not send emails if in debug mode
-    if current_app.config.get("TESTING", False):
+    current_app.logger.info("From send_feedback_email: Host header: {}".format(request.headers.get("Host", "No Host Specified")))
+
+    if current_app.config.get("TESTING", False) or request.headers.get("Host", "").endswith("shadow"):
         current_app.logger.warning(
             "Feedback email with subject {} was NOT sent due to TESTING flag = True".format(
                 subject
@@ -107,14 +111,17 @@ def send_feedback_email(
     if attachments:
         for attachment in attachments:
             message.add_attachment(
-                json.dumps(attachment[1]),
-                filename=attachment[0],
+                json.dumps(attachment[1]).encode('utf-8'),
+                filename=attachment[0].strip('.txt')+str('.json'),
                 maintype="application",
                 subtype="json",
             )
 
     with smtplib.SMTP(mail_server) as s:
-        s.send_message(message)
+        try:
+            s.send_message(message)
+        except Exception:
+            current_app.logger.exception("Failed to send message for Feedback email from: {}".format(submitter_email))
 
 
 def verify_recaptcha(request: Request, endpoint: str = None):
@@ -129,9 +136,9 @@ def verify_recaptcha(request: Request, endpoint: str = None):
     Returns:
         bool: True if reCAPTCHA verification is successful, False otherwise.
     """
-
+    current_app.logger.info("From verify recaptcha: Host header: {}".format(request.headers.get("Host", "No Host Specified")))
     # Skip reCAPTCHA verification if in debug mode
-    if current_app.config.get("TESTING", False):
+    if current_app.config.get("TESTING", False) or request.headers.get("Host", "").endswith("shadow"):
         current_app.logger.warning("reCAPTCHA is NOT verified during testing")
         return True
 

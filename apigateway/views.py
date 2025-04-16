@@ -575,6 +575,29 @@ class UserInfoView(Resource):
                 else:
                     # Client ID not found in database
                     return {"message": "Identifier not found [ERR 030]"}, 404
+            elif "_user_id" in session_data:
+                # There can be more than one token per user (generally one for
+                # BBB and one for API requests), when client id is not stored
+                # in the session (typically for authenticated users) we pick
+                # just the first in the database that corresponds to BBB since
+                # sessions are used by BBB and not API requests
+                client = OAuth2Client.query.filter_by(
+                    user_id=session_data["_user_id"], name="BB client"
+                ).first()
+
+                if client:
+                    token = OAuth2Token.query.filter_by(
+                        client_id=client.id, user_id=session_data["_user_id"]
+                    ).first()
+
+                    if token:
+                        return self._translate(token, source="session:user_id")
+                    else:
+                        # Token not found in database
+                        return {"message": "Identifier not found [ERR 020]"}, 404
+                else:
+                    # Client ID not found in database
+                    return {"message": "Identifier not found [ERR 030]"}, 404
             else:
                 # This should not happen, all ADS created session should contain that parameter
                 return {"message": "Missing oauth_client/user_id parameter in session"}, 500
@@ -705,6 +728,7 @@ class UserFeedbackView(Resource):
             )
             return True
         except:  # noqa
+            current_app.logger.exception("Failed to send feedback email from user: {}".format(submitter_email))
             return False
 
     def _post_to_slack(self, slack_data):
