@@ -135,7 +135,7 @@ def register_error_handlers(app: Flask):
 
     @app.errorhandler(401)
     def on_401(e):
-        return jsonify({"message": "Unauthorized"}), 401
+        return jsonify({"message": "Unauthorized. If you are using the API, please confirm your Authorization header is of the form Bearer TOKEN and not Bearer:TOKEN"}), 401
 
     @app.errorhandler(405)
     def on_405(e):
