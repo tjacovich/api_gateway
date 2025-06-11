@@ -102,7 +102,7 @@ def send_feedback_email(
     recipient = current_app.config["FEEDBACK_EMAIL_SUBJECT_OVERRIDE"].get(subject, default_email)
 
     message = EmailMessage()
-    message["Subject"] = f"[{subject}] from {submitter_name} ({submitter_email})"
+    message["Subject"] = f"{subject} from {submitter_name} ({submitter_email})"
     message["From"] = f"ADS Administation <{default_email}>"
     message["To"] = recipient
     message["reply-to"] = f"{submitter_name} <{submitter_email}>"
