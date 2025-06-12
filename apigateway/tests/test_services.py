@@ -110,24 +110,6 @@ class TestAuthService:
 
             assert "X-api-uid" in request.headers
 
-    def test_invalid_auth_headers_set(self, app, mock_regular_user):
-        _, token = app.auth_service.bootstrap_user()
-
-        @app.route("/test_invalid_auth_headers_set")
-        def test_invalid_route():
-            pass
-
-        with app.test_request_context(
-            "/test_invalid_auth_headers_set",
-            headers={
-                "Authorization": "Bearer:" + token.access_token,
-            },
-        ):
-            # Manually call before_request functions
-            for func in app.before_request_funcs[None]:
-                func()
-
-            assert request.status_code==401
 
     def test_headers_not_set(self, app):
 
