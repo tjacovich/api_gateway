@@ -1408,10 +1408,15 @@ class KafkaProducerService(GatewayService):
         @app.after_request
         def _after_request_hook(response: Response):
             if self._producer is not None:
+                try:
+                    real_user = current_user._get_current_object()
+                except RuntimeError:
+                    current_app.logger.exception("Unable to collect real user. Most likely due to unbound session.")
+                    return response
                 self._producer.send(
                     self.get_service_config("REQUEST_TOPIC"),
                     {
-                        "user_id": current_user.get_id(),
+                        "user_id": real_user.get_id(),
                         "client_id": (
                             current_token.client_id
                             if current_token and hasattr(current_token, "client")
