@@ -9,6 +9,7 @@ import os
 
 import jsondiff as jd
 import requests
+from authlib.oauth2.rfc6749.errors import UnsupportedTokenTypeError
 from authlib.integrations.flask_oauth2 import ResourceProtector
 from flask import Request, current_app, request
 from flask.views import View
@@ -273,6 +274,10 @@ class ProxyView(View):
 class GatewayResourceProtector(ResourceProtector):
     def raise_error_response(self, error):
         body = json.dumps(dict({"message": error.description}))
+        if type(error)==UnsupportedTokenTypeError:
+            current_app.logger.info("Token not recognized as a Bearer Token.")
+            body="Unauthorized. If you are using the API, please confirm your Authorization header is of the form Bearer TOKEN and not Bearer:TOKEN"
+            raise Oauth2HttpError(error.status_code, error.description, body, error.get_headers())
         raise Oauth2HttpError(error.status_code, error.description, body, error.get_headers())
 
 

@@ -110,6 +110,7 @@ class TestAuthService:
 
             assert "X-api-uid" in request.headers
 
+
     def test_headers_not_set(self, app):
 
         @app.route("/test_auth_headers_not_set")

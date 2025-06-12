@@ -85,7 +85,7 @@ def register_hooks(app: Flask):
         This overrides the default behavior or re-directing to a login view
         """
         abort(401)
-    
+        
     @app.teardown_request
     def teardown_request(exception=None):
         """This function will close active transaction, if there is one
