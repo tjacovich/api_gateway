@@ -5,6 +5,7 @@ from functools import wraps
 from typing import Tuple
 from urllib.parse import urljoin
 import re
+import os
 
 import jsondiff as jd
 import requests
@@ -257,8 +258,14 @@ class ProxyView(View):
         path = request.full_path.replace(self._deploy_path, "", 1)
         path = path[1:] if path.startswith("/") else path
         
-        if verify_url_regex.match(path): return str(self._remote_base_url)+"/"+str(path)
-        
+        try:
+            resolver_check = verify_url_regex.match(path)
+            if resolver_check: 
+                resolver_groups = resolver_check.groups()
+                return str(self._remote_base_url) + "/" + os.path.normpath(resolver_groups[0]) \
+                    + resolver_groups[1] + os.path.normpath(resolver_groups[2])
+        except ValueError:
+            current_app.logger.exception("Failed to properly check url path for resolver verify_url path.")    
         return urljoin(self._remote_base_url, path)
 
 
