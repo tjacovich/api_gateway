@@ -257,7 +257,8 @@ class ProxyView(View):
 
         path = request.full_path.replace(self._deploy_path, "", 1)
         path = path[1:] if path.startswith("/") else path
-        
+        #This block exists because of an incompatibility between urlparse.urljoin and urllib.parse.urljoin
+        #This incompatibility results in http(s):// -> http(s):/ if the proc spec occurs in the middle of the url.
         try:
             resolver_check = verify_url_regex.match(path)
             if resolver_check: 
