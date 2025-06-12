@@ -85,7 +85,7 @@ def register_hooks(app: Flask):
         This overrides the default behavior or re-directing to a login view
         """
         abort(401)
-    
+        
     @app.teardown_request
     def teardown_request(exception=None):
         """This function will close active transaction, if there is one
@@ -135,7 +135,7 @@ def register_error_handlers(app: Flask):
 
     @app.errorhandler(401)
     def on_401(e):
-        return jsonify({"message": "Unauthorized. If you are using the API, please confirm your Authorization header is of the form Bearer TOKEN and not Bearer:TOKEN"}), 401
+        return jsonify({"message": "Unauthorized"}), 401
 
     @app.errorhandler(405)
     def on_405(e):
