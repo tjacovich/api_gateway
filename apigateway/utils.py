@@ -253,8 +253,8 @@ class ProxyView(View):
         Returns:
             str: The URL of the remote server.
         """
-        verify_url_regex = re.compile(r"^([12]\d\d\d[A-Za-z&\.]{5}[A-Za-z0-9\.]{9}[A-Z\.]/verify_url\:http[s]?\://.*)")
-
+        verify_url_regex = re.compile(r"([12]\d\d\d[A-Za-z&\.]{5}[A-Za-z0-9\.]{9}[A-Z\.]/verify_url\:)(http[s]?\://)(.*)")
+        
         path = request.full_path.replace(self._deploy_path, "", 1)
         path = path[1:] if path.startswith("/") else path
         #This block exists because of an incompatibility between urlparse.urljoin and urllib.parse.urljoin
