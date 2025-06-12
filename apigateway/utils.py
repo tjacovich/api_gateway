@@ -252,10 +252,13 @@ class ProxyView(View):
         Returns:
             str: The URL of the remote server.
         """
+        verify_url_regex = re.compile(r"^([12]\d\d\d[A-Za-z&\.]{5}[A-Za-z0-9\.]{9}[A-Z\.]/verify_url\:http[s]?\://.*)")
+
         path = request.full_path.replace(self._deploy_path, "", 1)
         path = path[1:] if path.startswith("/") else path
-        verify_url_regex = re.compile(r"^([12]\d\d\d[A-Za-z&\.]{5}[A-Za-z0-9\.]{9}[A-Z\.]/verify_url\:http[s]?\://.*)")
+        
         if verify_url_regex.match(path): return str(self._remote_base_url)+"/"+str(path)
+        
         return urljoin(self._remote_base_url, path)
 
 
