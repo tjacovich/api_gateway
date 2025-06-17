@@ -478,6 +478,11 @@ class ProxyService(GatewayService):
                     proxy_view
                 )
 
+            if properties["affinity"]:
+                proxy_view = extensions.affinity_service.require_oauth(properties["affinity_routes"])(
+                    proxy_view
+                )
+
             # Register the view with Flask
             self._app.add_url_rule(
                 rule_name,
@@ -1447,7 +1452,28 @@ class KafkaProducerService(GatewayService):
 
 
 class AffinityService(GatewayService):
-    def _get_route(self, storage, route_redis_prefix, user_token):
+    def __init__(self, name: str = "AFFINITY_SERVICE"):
+        """Initializes a new instance of the `AffinityService` class.
+
+        Args:
+            name (str, optional): The name of the service. Defaults to "AFFINITY_SERVICE".
+        """
+        GatewayService.__init__(self, name)
+
+    def init_app(self, app: Flask, storage_service: StorageService):
+        """Initializes the service with the specified Flask application.
+
+        This method initializes the service with the specified Flask application by setting default
+        configuration values and registering hooks.
+
+        Args:
+            app (Flask): The Flask application to initialize the service with.
+        """
+        GatewayService.init_app(self, app)
+        self._storage_service = storage_service
+        self._register_hooks(app)
+
+    def _get_route(self, route_redis_prefix, user_token):
         """
         Obtains the solr route from redis for a given user token. It piggybacks the
         existing rate limiter extension connection, and if it fails the request
@@ -1455,14 +1481,14 @@ class AffinityService(GatewayService):
         assigning a solr instance).
         """
         try:
-            route = storage.get(route_redis_prefix+user_token)
+            route = self._storage_service.get(route_redis_prefix+user_token)
             if route:
                 current_app.logger.info("Recovered cached affinity route '{}' from '{}'".format(route, route_redis_prefix+user_token))
         except:
             route = None
         return route
-    @staticmethod
-    def _set_route(self, storage, route_redis_prefix, user_token, route, route_redis_expiration_time):
+    
+    def _set_route(self, route_redis_prefix, user_token, route, route_redis_expiration_time):
         """
         Sets the solr route from redis for a given user token. It piggybacks the
         existing rate limiter extension connection, and if it fails the request
@@ -1473,12 +1499,12 @@ class AffinityService(GatewayService):
         of a particular solr and to automatically clear entries in redis.
         """
         try:
-            storage.setex(route_redis_prefix+user_token, route, route_redis_expiration_time)
+            self._storage_service.setex(route_redis_prefix+user_token, route, route_redis_expiration_time)
             current_app.logger.info("Stored affinity route '{}' into '{}'".format(route, route_redis_prefix+user_token))
         except:
             pass
 
-    def _build_updated_cookies(self, request, user_token, route, name):
+    def _build_updated_cookies(self, request, route, name):
         """
         Based on the current request, create updated headers and cookies content
         attributes.
@@ -1506,51 +1532,49 @@ class AffinityService(GatewayService):
         cookies_header_content = cookies_header.output(header="", sep=";").strip()
         cookies_content = ImmutableTypeConversionDict(cookies)
         return cookies_header_content, cookies_content
+    
+    def _register_hooks(self, app: Flask):
+        @app.after_request
+        def _after_request_hook(response: Response, name="sroute"):
+            """
+            Assign a cookie that will be used by solr ingress to send request to
+            a specific solr instance for the same user, maximizing the use of solr
+            cache capabilities.
 
-    def affinity_decorator(self, storage, name="sroute"):
-        """
-        Assign a cookie that will be used by solr ingress to send request to
-        a specific solr instance for the same user, maximizing the use of solr
-        cache capabilities.
+            The storage should be a redis connection.
+            """
+            route_redis_prefix="token:{}:".format(name)
+            route_redis_expiration_time=86400 # 1 day
 
-        The storage should be a redis connection.
-        """
-        route_redis_prefix="token:{}:".format(name)
-        route_redis_expiration_time=86400 # 1 day
 
-        def real_affinity_decorator(f):
-            @wraps(f)
-            def decorated_function(*args, **kwargs):
-                # Obtain user token, giving priority to forwarded authorization field (used when a microservice uses its own token)
-                user_token = request.headers.get('X-Forwarded-Authorization', None)
-                if user_token is None or user_token == u"-":
-                    user_token = request.headers.get('Authorization', None)
-                if user_token and len(user_token) > 7: # This should be always true
-                    user_token = user_token[7:] # Get rid of "Bearer:" or "Bearer "
-                    route = self._get_route(storage, route_redis_prefix, user_token)
-                    cookies_header_content, cookies_content = self._build_updated_cookies(request, user_token, route, name)
-                    # Update request cookies (header and cookies attributes)
-                    request.headers = Headers(request.headers)
-                    request.headers.set('cookie', cookies_header_content)
-                    request.cookies = cookies_content
+            # Obtain user token, giving priority to forwarded authorization field (used when a microservice uses its own token)
+            user_token = request.headers.get('X-Forwarded-Authorization', None)
+            if user_token is None or user_token == u"-":
+                user_token = request.headers.get('Authorization', None)
+            if user_token and len(user_token) > 7: # This should be always true
+                user_token = user_token[7:] # Get rid of "Bearer:" or "Bearer "
+                route = self._get_route(route_redis_prefix, user_token)
+                cookies_header_content, cookies_content = self._build_updated_cookies(request, user_token, route, name)
+                # Update request cookies (header and cookies attributes)
+                request.headers = Headers(request.headers)
+                request.headers.set('cookie', cookies_header_content)
+                request.cookies = cookies_content
 
-                r = f(*args, **kwargs)
-                if type(r) is tuple and len(r) > 2:
-                    response_headers = r[2]
-                elif hasattr(r, 'headers'):
-                    response_headers = r.headers
-                else:
-                    response_headers = None
+            r = response
+            if type(r) is tuple and len(r) > 2:
+                response_headers = r[2]
+            elif hasattr(r, 'headers'):
+                response_headers = r.headers
+            else:
+                response_headers = None
 
-                if user_token and response_headers:
-                    set_cookie = response_headers.pop('Set-Cookie', None)
-                    if set_cookie:
-                        # If solr issued a set cookie, store the value in redis linked to the user token
-                        cookie = http.cookies.SimpleCookie()
-                        cookie.load(set_cookie.encode("utf8"))
-                        route = cookie.get(name, None)
-                        if route:
-                            self._set_route(storage, route_redis_prefix, user_token, route.value, route_redis_expiration_time)
-                return r
-            return decorated_function
-        return real_affinity_decorator
+            if user_token and response_headers:
+                set_cookie = response_headers.pop('Set-Cookie', None)
+                if set_cookie:
+                    # If solr issued a set cookie, store the value in redis linked to the user token
+                    cookie = http.cookies.SimpleCookie()
+                    cookie.load(set_cookie.encode("utf8"))
+                    route = cookie.get(name, None)
+                    if route:
+                        self._set_route(route_redis_prefix, user_token, route.value, route_redis_expiration_time)
+            return r

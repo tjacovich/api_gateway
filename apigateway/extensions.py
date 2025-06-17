@@ -16,6 +16,7 @@ from apigateway.services import (
     RedisService,
     SecurityService,
     StorageService,
+    AffinityService
 )
 
 # Database
@@ -40,3 +41,4 @@ limiter_service = LimiterService()
 cache_service = CacheService()
 kakfa_producer_service = KafkaProducerService()
 storage_service = StorageService()
+affinity_service = AffinityService()
