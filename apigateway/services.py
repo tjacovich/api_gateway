@@ -478,10 +478,7 @@ class ProxyService(GatewayService):
                     proxy_view
                 )
 
-            if properties["affinity"]:
-                proxy_view = extensions.affinity_service.require_oauth(properties["affinity_routes"])(
-                    proxy_view
-                )
+            proxy_view = extensions.affinity_service(proxy_view)
 
             # Register the view with Flask
             self._app.add_url_rule(
