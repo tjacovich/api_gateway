@@ -1475,7 +1475,7 @@ class AffinityService(GatewayService):
 
     def group_endpoint(self, endpoint: str):
         for group, values in self._affinity_groups.items():
-            if any(re.match(group, endpoint)):
+            if re.match(group, endpoint):
                 if group not in self._affinity_endpoints.keys():
                     self._affinity_endpoints[group] = {
                         group : values
