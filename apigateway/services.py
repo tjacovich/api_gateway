@@ -478,7 +478,7 @@ class ProxyService(GatewayService):
                     proxy_view
                 )
 
-            proxy_view = extensions.affinity_service.group_endpoint(proxy_view)
+            proxy_view = extensions.affinity_service.group_endpoint(local_path)
 
             # Register the view with Flask
             self._app.add_url_rule(
