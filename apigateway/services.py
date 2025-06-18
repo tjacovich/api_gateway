@@ -478,7 +478,7 @@ class ProxyService(GatewayService):
                     proxy_view
                 )
 
-            proxy_view = extensions.affinity_service.group_endpoint(local_path)
+            extensions.affinity_service.group_endpoint(local_path)
 
             # Register the view with Flask
             self._app.add_url_rule(
@@ -1525,8 +1525,11 @@ class AffinityService(GatewayService):
         cookies_header = http.cookies.SimpleCookie()
         currrent_cookie_content = request.headers.get('cookie', None)
         if currrent_cookie_content:
-            current_app.logger.info("Current cookie: {}".format(currrent_cookie_content))
-            cookies_header.load(currrent_cookie_content.encode("utf8"))
+            try:
+                current_app.logger.info("Current cookie: {}".format(currrent_cookie_content))
+                cookies_header.load(currrent_cookie_content.encode("utf8"))
+            except:
+                current_app.logger.info("Bad cookie in affinity cache.")
         # Interpret cookies attribute (immutable dict) as a normal dict
         if request.cookies:
             cookies = dict(request.cookies)
@@ -1565,7 +1568,7 @@ class AffinityService(GatewayService):
                 if user_token and len(user_token) > 7: # This should be always true
                     user_token = user_token[7:] # Get rid of "Bearer:" or "Bearer "
                     route = self._get_route(route_redis_prefix, user_token)
-                    cookies_header_content, cookies_content = self._build_updated_cookies(request, route, self._affinity_endpoints.get(request.endpoint,"sroute"))
+                    cookies_header_content, cookies_content = self._build_updated_cookies(request, route, self._affinity_endpoints.get(request.endpoint, "sroute"))
                     # Update request cookies (header and cookies attributes)
                     request.headers = Headers(request.headers)
                     request.headers.set('cookie', cookies_header_content)
@@ -1575,6 +1578,7 @@ class AffinityService(GatewayService):
         def _after_request_hook(response: Response, name="sroute"):
             if not request.endpoint in self._affinity_endpoints.keys():
                 return response
+            
             r = response
             route_redis_prefix="token:{}:".format(name)
             route_redis_expiration_time=86400 # 1 day
@@ -1595,10 +1599,11 @@ class AffinityService(GatewayService):
             elif hasattr(r, 'headers'):
                 response_headers = r.headers
             else:
-                response_headers = None
+                response_headers = {}
 
             if user_token and response_headers:
                 set_cookie = response_headers.pop('Set-Cookie', None)
+                current_app.logger.info("Set-Cookie: {}".format(set_cookie))
                 if set_cookie:
                     # If solr issued a set cookie, store the value in redis linked to the user token
                     cookie = http.cookies.SimpleCookie()
