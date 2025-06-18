@@ -1559,21 +1559,20 @@ class AffinityService(GatewayService):
             route_redis_prefix="token:{}:".format(name)
 
             if request.endpoint in self._affinity_endpoints.keys():
-                return
+                # Obtain user token, giving priority to forwarded authorization field (used when a microservice uses its own token)
+                user_token = request.headers.get('X-Forwarded-Authorization', None)
+                if user_token is None or user_token == u"-":
+                    user_token = request.headers.get('Authorization', None)
+                if user_token and len(user_token) > 7: # This should be always true
+                    user_token = user_token[7:] # Get rid of "Bearer:" or "Bearer "
+                    route = self._get_route(route_redis_prefix, user_token)
+                    cookies_header_content, cookies_content = self._build_updated_cookies(request, route, name)
+                    # Update request cookies (header and cookies attributes)
+                    request.headers = Headers(request.headers)
+                    request.headers.set('cookie', cookies_header_content)
+                    request.cookies = cookies_content
 
-            # Obtain user token, giving priority to forwarded authorization field (used when a microservice uses its own token)
-            user_token = request.headers.get('X-Forwarded-Authorization', None)
-            if user_token is None or user_token == u"-":
-                user_token = request.headers.get('Authorization', None)
-            if user_token and len(user_token) > 7: # This should be always true
-                user_token = user_token[7:] # Get rid of "Bearer:" or "Bearer "
-                route = self._get_route(route_redis_prefix, user_token)
-                cookies_header_content, cookies_content = self._build_updated_cookies(request, route, name)
-                # Update request cookies (header and cookies attributes)
-                request.headers = Headers(request.headers)
-                request.headers.set('cookie', cookies_header_content)
-                request.cookies = cookies_content
-
+        @app.after_request
         def _after_request_hook(response: Response, name="sroute"):
             if request.endpoint in self._affinity_endpoints.keys():
                 return response
