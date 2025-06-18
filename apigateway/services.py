@@ -1525,6 +1525,7 @@ class AffinityService(GatewayService):
         cookies_header = http.cookies.SimpleCookie()
         currrent_cookie_content = request.headers.get('cookie', None)
         if currrent_cookie_content:
+            current_app.logger.info("Current cookie: {}".format(currrent_cookie_content))
             cookies_header.load(currrent_cookie_content.encode("utf8"))
         # Interpret cookies attribute (immutable dict) as a normal dict
         if request.cookies:
@@ -1546,8 +1547,8 @@ class AffinityService(GatewayService):
         return cookies_header_content, cookies_content
     
     def _register_hooks(self, app: Flask):
-        @app.after_request
-        def _after_request_hook(response: Response, name="sroute"):
+        @app.before_request
+        def before_request_hook(name="sroute"):
             """
             Assign a cookie that will be used by solr ingress to send request to
             a specific solr instance for the same user, maximizing the use of solr
@@ -1556,9 +1557,9 @@ class AffinityService(GatewayService):
             The storage should be a redis connection.
             """
             route_redis_prefix="token:{}:".format(name)
-            route_redis_expiration_time=86400 # 1 day
+            current_app.logger.info("Stored affinity route '{}' into '{}'".format(route, route_redis_prefix+user_token))
 
-            if not request.endpoint not in self._affinity_endpoints.keys():
+            if request.endpoint in self._affinity_endpoints.keys():
                 return
 
             # Obtain user token, giving priority to forwarded authorization field (used when a microservice uses its own token)
@@ -1568,13 +1569,30 @@ class AffinityService(GatewayService):
             if user_token and len(user_token) > 7: # This should be always true
                 user_token = user_token[7:] # Get rid of "Bearer:" or "Bearer "
                 route = self._get_route(route_redis_prefix, user_token)
-                cookies_header_content, cookies_content = self._build_updated_cookies(request, user_token, route, name)
+                cookies_header_content, cookies_content = self._build_updated_cookies(request, route, name)
                 # Update request cookies (header and cookies attributes)
                 request.headers = Headers(request.headers)
                 request.headers.set('cookie', cookies_header_content)
                 request.cookies = cookies_content
 
+        def _after_request_hook(response: Response, name="sroute"):
+            if request.endpoint in self._affinity_endpoints.keys():
+                return response
             r = response
+            route_redis_prefix="token:{}:".format(name)
+            route_redis_expiration_time=86400 # 1 day
+            user_token = request.headers.get('X-Forwarded-Authorization', None)
+            if user_token is None or user_token == u"-":
+                user_token = request.headers.get('Authorization', None)
+            if user_token and len(user_token) > 7: # This should be always true
+                user_token = user_token[7:] # Get rid of "Bearer:" or "Bearer "
+                route = self._get_route(route_redis_prefix, user_token)
+                cookies_header_content, cookies_content = self._build_updated_cookies(request, route, name)
+                # Update request cookies (header and cookies attributes)
+                request.headers = Headers(request.headers)
+                request.headers.set('cookie', cookies_header_content)
+                request.cookies = cookies_content
+                
             if type(r) is tuple and len(r) > 2:
                 response_headers = r[2]
             elif hasattr(r, 'headers'):
