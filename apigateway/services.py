@@ -478,7 +478,7 @@ class ProxyService(GatewayService):
                     proxy_view
                 )
 
-            proxy_view = extensions.affinity_service(proxy_view)
+            proxy_view = extensions.affinity_service.group_endpoint(proxy_view)
 
             # Register the view with Flask
             self._app.add_url_rule(
@@ -1468,7 +1468,22 @@ class AffinityService(GatewayService):
         """
         GatewayService.init_app(self, app)
         self._storage_service = storage_service
+        self._affinity_groups = self.get_service_config("ENDPOINTS", {})
+        self._affinity_endpoints = {}
+
         self._register_hooks(app)
+
+    def group_endpoint(self, endpoint: str):
+        for group, values in self._affinity_groups.items():
+            if any(re.match(group, endpoint)):
+                if group not in self._affinity_endpoints.keys():
+                    self._affinity_endpoints[group] = {
+                        group : values
+                    }
+
+                self._logger.info(f'"{endpoint}" added to affinity group "{group}"')
+                self._affinity_endpoints[endpoint] = self._affinity_endpoints[group]
+                break
 
     def _get_route(self, route_redis_prefix, user_token):
         """
@@ -1543,6 +1558,8 @@ class AffinityService(GatewayService):
             route_redis_prefix="token:{}:".format(name)
             route_redis_expiration_time=86400 # 1 day
 
+            if not request.endpoint not in self._affinity_endpoints.keys():
+                return
 
             # Obtain user token, giving priority to forwarded authorization field (used when a microservice uses its own token)
             user_token = request.headers.get('X-Forwarded-Authorization', None)

@@ -86,7 +86,7 @@ LIMITER_SERVICE_GROUPS = {
         "patterns": ["/scan/metadata/*"],
     }
 }
-
+AFFINITY_SERVICE_ENDPOINTS = {"/search": "sroute",}
 # Redis service
 REDIS_SERVICE_URL = "redis://redis:6379/0"
 
