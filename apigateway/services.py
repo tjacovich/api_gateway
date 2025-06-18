@@ -1557,7 +1557,6 @@ class AffinityService(GatewayService):
             The storage should be a redis connection.
             """
             route_redis_prefix="token:{}:".format(name)
-            current_app.logger.info("Stored affinity route '{}' into '{}'".format(route, route_redis_prefix+user_token))
 
             if request.endpoint in self._affinity_endpoints.keys():
                 return
