@@ -1548,7 +1548,7 @@ class AffinityService(GatewayService):
     
     def _register_hooks(self, app: Flask):
         @app.before_request
-        def before_request_hook(name="sroute"):
+        def before_request_hook():
             """
             Assign a cookie that will be used by solr ingress to send request to
             a specific solr instance for the same user, maximizing the use of solr
@@ -1556,9 +1556,8 @@ class AffinityService(GatewayService):
 
             The storage should be a redis connection.
             """
-            route_redis_prefix="token:{}:".format(name)
-
             if request.endpoint in self._affinity_endpoints.keys():
+                route_redis_prefix="token:{}:".format(self._affinity_endpoints.get(request.endpoint), "sroute")
                 # Obtain user token, giving priority to forwarded authorization field (used when a microservice uses its own token)
                 user_token = request.headers.get('X-Forwarded-Authorization', None)
                 if user_token is None or user_token == u"-":
@@ -1566,7 +1565,7 @@ class AffinityService(GatewayService):
                 if user_token and len(user_token) > 7: # This should be always true
                     user_token = user_token[7:] # Get rid of "Bearer:" or "Bearer "
                     route = self._get_route(route_redis_prefix, user_token)
-                    cookies_header_content, cookies_content = self._build_updated_cookies(request, route, name)
+                    cookies_header_content, cookies_content = self._build_updated_cookies(request, route, self._affinity_endpoints.get(request.endpoint,"sroute"))
                     # Update request cookies (header and cookies attributes)
                     request.headers = Headers(request.headers)
                     request.headers.set('cookie', cookies_header_content)
@@ -1574,7 +1573,7 @@ class AffinityService(GatewayService):
 
         @app.after_request
         def _after_request_hook(response: Response, name="sroute"):
-            if request.endpoint in self._affinity_endpoints.keys():
+            if not request.endpoint in self._affinity_endpoints.keys():
                 return response
             r = response
             route_redis_prefix="token:{}:".format(name)
