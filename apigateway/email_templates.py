@@ -11,67 +11,29 @@ html_template = """
         <head>
             <meta name="viewport" content="width=device-width">
             <meta http-equiv="Content-Type" content="text/html charset=UTF-8" />
-            <style type="text/css">
-                @media only screen and (max-width: 480px){{
-                    #templateColumns{{
-                        width:100% !important;
-                    }}
-
-                    .templateColumnContainer{{
-                        display:block !important;
-                        width:100% !important;
-                    }}
-
-                    .columnContent{{
-                        font-size:16px !important;
-                        line-height:125% !important;
-                    }}
-
-                    .leftColumnContent{{
-                        font-size:16px !important;
-                        line-height:125% !important;
-                    }}
-
-                    .rightColumnContent{{
-                        font-size:16px !important;
-                        line-height:125% !important;
-                    }}
-
-                    h2, h3 {{
-                        font-size: 100%
-                    }}
-                }}
-                @media screen and (prefers-color-scheme: dark) {{
-                    a {{
-                        color: #FFFFFF;
-                    }}
-
-                    body {{
-                        background-color: #2d3239;
-                    }}
-                }}
-            </style>
         </head>
         <body>
-            <table border="0" cellpadding="0" cellspacing="0" height="100%" width="100%" id="bodyTable" style="background-color: #FFFFFF;">
+            <table border="0" cellpadding="0" cellspacing="0" height="100%" width="100%" id="bodyTable" style="background-color: #E0E0E0;">
                 <tr>
                     <td align="center" valign="top">
-                        <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 1024px;" id="emailContainer" >
+                        <table border="0" cellpadding="10" cellspacing="0" width="600" id="emailContainer">
                             <tr>
-                                <td align="center" valign="top" style="font-family:Arial;">
-                                    <table border="0" cellpadding="0" cellspacing="0" width="100%" id="emailBody" >
+                                <td align="center" valign="top">
+                                    <table border="0" cellpadding="20" cellspacing="0" width="100%" id="emailHeader">
+        
+                                    </table>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td align="center" valign="top">
+                                    <table border="0" cellpadding="20" cellspacing="0" width="100%" id="emailBody" style="background-color: #ffffff;">
                                         <tr>
-                                            <td align="center" valign="top" id="m_4393282051944905389m_-5269006104307297584templateHeader">
-                                                <img src="https://scixplorer.org/styles/img/newsletter-banner.jpg" style="max-width: 100%; height: auto;"/>
+                                            <td align="center" valign="top" background="https://ui.adsabs.harvard.edu/styles/img/background.jpg" style="width:100%; background-color: #150E35" >
+                                                <img src="https://ui.adsabs.harvard.edu/styles/img/ads_logo.png" alt="Astrophysics Data System" style="width: 70%; color: #ffffff; font-size: 34px; font-family: sans-serif;"/> 
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td align="center" valign="top" style="width:100%;">
-                                                &nbsp;
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td align="center" style="width:100%; font-size: 14px; font-family:Arial">
+                                            <td align="left" valign="top">
                                                 {msg}
                                             </td>
                                         </tr>
@@ -97,6 +59,100 @@ html_template = """
         </body>
     </html>
     """
+
+
+# html_template = """
+#     <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+#     <html>
+#         <head>
+#             <meta name="viewport" content="width=device-width">
+#             <meta http-equiv="Content-Type" content="text/html charset=UTF-8" />
+#             <style type="text/css">
+#                 @media only screen and (max-width: 480px){{
+#                     #templateColumns{{
+#                         width:100% !important;
+#                     }}
+
+#                     .templateColumnContainer{{
+#                         display:block !important;
+#                         width:100% !important;
+#                     }}
+
+#                     .columnContent{{
+#                         font-size:16px !important;
+#                         line-height:125% !important;
+#                     }}
+
+#                     .leftColumnContent{{
+#                         font-size:16px !important;
+#                         line-height:125% !important;
+#                     }}
+
+#                     .rightColumnContent{{
+#                         font-size:16px !important;
+#                         line-height:125% !important;
+#                     }}
+
+#                     h2, h3 {{
+#                         font-size: 100%
+#                     }}
+#                 }}
+#                 @media screen and (prefers-color-scheme: dark) {{
+#                     a {{
+#                         color: #FFFFFF;
+#                     }}
+
+#                     body {{
+#                         background-color: #2d3239;
+#                     }}
+#                 }}
+#             </style>
+#         </head>
+#         <body>
+#             <table border="0" cellpadding="0" cellspacing="0" height="100%" width="100%" id="bodyTable" style="background-color: #FFFFFF;">
+#                 <tr>
+#                     <td align="center" valign="top">
+#                         <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 1024px;" id="emailContainer" >
+#                             <tr>
+#                                 <td align="center" valign="top" style="font-family:Arial;">
+#                                     <table border="0" cellpadding="0" cellspacing="0" width="100%" id="emailBody" >
+#                                         <tr>
+#                                             <td align="center" valign="top" id="m_4393282051944905389m_-5269006104307297584templateHeader">
+#                                                 <img src="https://scixplorer.org/styles/img/newsletter-banner.jpg" style="max-width: 100%; height: auto;"/>
+#                                             </td>
+#                                         </tr>
+#                                         <tr>
+#                                             <td align="center" valign="top" style="width:100%;">
+#                                                 &nbsp;
+#                                             </td>
+#                                         </tr>
+#                                         <tr>
+#                                             <td align="center" style="width:100%; font-size: 14px; font-family:Arial">
+#                                                 {msg}
+#                                             </td>
+#                                         </tr>
+#                                     </table>
+#                                 </td>
+#                             </tr>
+#                             <tr>
+#                                 <td align="center" valign="top">
+#                                     <table border="0" cellpadding="20" cellspacing="0" width="100%" id="emailFooter" style="color: #999999; font-size: 12px; text-align: center; font-family: sans-serif;">
+#                                         <tr>
+#                                             <td align="center" valign="top">
+#                                                 <p> This message was sent to {email_address}. </p>
+#                                                 <p> &copy; SAO/NASA <a href="https://ui.adsabs.harvard.edu">Astrophysics Data System</a> <br> 60 Garden Street <br> Cambridge, MA</p>
+#                                             </td>
+#                                         </tr>
+#                                     </table>
+#                                 </td>
+#                             </tr>
+#                         </table>
+#                     </td>
+#                 </tr>
+#             </table>
+#         </body>
+#     </html>
+#     """
 
 
 class EmailTemplate(object):
