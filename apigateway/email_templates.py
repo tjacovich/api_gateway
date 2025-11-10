@@ -28,8 +28,8 @@ html_template = """
                                 <td align="center" valign="top">
                                     <table border="0" cellpadding="20" cellspacing="0" width="100%" id="emailBody" style="background-color: #ffffff;">
                                         <tr>
-                                            <td align="center" valign="top" background="https://ui.adsabs.harvard.edu/styles/img/background.jpg" style="width:100%; background-color: #150E35" >
-                                                <img src="https://ui.adsabs.harvard.edu/styles/img/ads_logo.png" alt="Astrophysics Data System" style="width: 70%; color: #ffffff; font-size: 34px; font-family: sans-serif;"/> 
+                                            <td align="center" valign="top" id="m_4393282051944905389m_-5269006104307297584templateHeader">
+                                                <img src="https://scixplorer.org/styles/img/newsletter-banner.jpg" style="max-width: 100%; height: auto;"/>
                                             </td>
                                         </tr>
                                         <tr>
