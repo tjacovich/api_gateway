@@ -73,7 +73,7 @@ def send_email(
     message["To"] = recipient
     message.set_content(template.msg_plain.format(endpoint=verification_url, ui_env=ui_env, ui_url=ui_url))
     message.add_alternative(
-        template.msg_html.format(endpoint=verification_url, email_address=recipient),
+        template.msg_html.format(endpoint=verification_url, email_address=recipient, ui_url=ui_url, ui_env=ui_env),
         subtype="html",
     )
 
