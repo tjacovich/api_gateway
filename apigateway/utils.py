@@ -324,11 +324,11 @@ def send_password_reset_email(token: str, email: str):
     if "scixplorer" in request.headers.get("Host", ""):
         ui_env = "SciX"
         ui_url = current_app.config.get("SCIX_HOST_DOMAIN", "dev.scixplorer.org")
-        verification_url = f"{current_app.config['SCIX_VERIFY_URL']}/change-email/{token}"
+        verification_url = f"{current_app.config['SCIX_VERIFY_URL']}/reset-password/{token}"
     else:
         ui_env = "ADS"
         ui_url = current_app.config.get("ADS_HOST_DOMAIN", "dev.adsabs.harvard.edu")
-        verification_url = f"{current_app.config['VERIFY_URL']}/change-email/{token}"    
+        verification_url = f"{current_app.config['VERIFY_URL']}/reset-password/{token}"    
     send_email(
         sender=current_app.config["MAIL_DEFAULT_SENDER"],
         recipient=email,
@@ -343,11 +343,11 @@ def send_welcome_email(token: str, email: str):
     if "scixplorer" in request.headers.get("Host", ""):
         ui_env = "SciX"
         ui_url = current_app.config.get("SCIX_HOST_DOMAIN", "dev.scixplorer.org")
-        verification_url = f"{current_app.config['SCIX_VERIFY_URL']}/change-email/{token}"
+        verification_url = f"{current_app.config['SCIX_VERIFY_URL']}/register/{token}"
     else:
         ui_env = "ADS"
         ui_url = current_app.config.get("ADS_HOST_DOMAIN", "dev.adsabs.harvard.edu")
-        verification_url = f"{current_app.config['VERIFY_URL']}/change-email/{token}"
+        verification_url = f"{current_app.config['VERIFY_URL']}/register/{token}"
     send_email(
         sender=current_app.config["MAIL_DEFAULT_SENDER"],
         recipient=email,
