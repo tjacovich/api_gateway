@@ -194,7 +194,7 @@ account associated with this email address. Click the link below to reset it:</p
         open_tag=open_tag, endpoint="""{endpoint}""",ui_url="""{ui_url}""",ui_env="""{ui_env}"""
     )
     msg_html = html_template.format(msg=msg, email_address="""{email_address}""")
-    subject = f"[{ui_env}] Password reset".format(ui_env="""{ui_env}""")
+    subject = """[{ui_env}] Password reset""".format(ui_env="""{ui_env}""")
 
 
 class WelcomeVerificationEmail(EmailTemplate):
@@ -227,7 +227,7 @@ please confirm your email address:</p>
         open_tag=open_tag, endpoint="""{endpoint}""", ui_url="""{ui_url}""", ui_env="""{ui_env}"""
     )
     msg_html = html_template.format(msg=msg, email_address="""{email_address}""")
-    subject = f"[{ui_env}] Please verify your email address".format(ui_env="""{ui_env}""")
+    subject = """[{ui_env}] Please verify your email address""".format(ui_env="""{ui_env}""")
 
 
 class VerificationEmail(EmailTemplate):
@@ -260,7 +260,7 @@ If you didn't request this, you can safely ignore this email.
         open_tag=open_tag, endpoint="""{endpoint}""", ui_url="""{ui_url}""", ui_env="""{ui_env}"""
     )
     msg_html = html_template.format(msg=msg, email_address="""{email_address}""")
-    subject = f"[{ui_env}] Please verify your email address".format(ui_env="""{ui_env}""")
+    subject = """[{ui_env}] Please verify your email address""".format(ui_env="""{ui_env}""")
 
 
 class EmailChangedNotification(EmailTemplate):
@@ -291,7 +291,7 @@ this email address will no longer be associated with your account.</p>
     )
 
     msg_html = html_template.format(msg=msg, email_address="""{email_address}""")
-    subject = f"[{ui_env}] An email change has been requested".format(ui_env="""{ui_env}""")
+    subject = """[{ui_env}] An email change has been requested""".format(ui_env="""{ui_env}""")
 
 
 class AccountRegistrationAttemptEmail(EmailTemplate):
@@ -318,4 +318,4 @@ If you have any questions or need further assistance, please reply to this email
         open_tag=open_tag, ui_url="""{ui_url}""", ui_env="""{ui_env}"""
     )
     msg_html = html_template.format(msg=msg, email_address="""{email_address}""")
-    subject = f"[{ui_env}] Account Registration Attempt Notice".format(ui_env="""{ui_env}""")
+    subject = """[{ui_env}] Account Registration Attempt Notice""".format(ui_env="""{ui_env}""")
