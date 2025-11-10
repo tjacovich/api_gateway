@@ -12,44 +12,44 @@ html_template = """
             <meta name="viewport" content="width=device-width">
             <meta http-equiv="Content-Type" content="text/html charset=UTF-8" />
             <style type="text/css">
-                @media only screen and (max-width: 480px){
-                    #templateColumns{
+                @media only screen and (max-width: 480px){{
+                    #templateColumns{{
                         width:100% !important;
-                    }
+                    }}
 
-                    .templateColumnContainer{
+                    .templateColumnContainer{{
                         display:block !important;
                         width:100% !important;
-                    }
+                    }}
 
-                    .columnContent{
+                    .columnContent{{
                         font-size:16px !important;
                         line-height:125% !important;
-                    }
+                    }}
 
-                    .leftColumnContent{
+                    .leftColumnContent{{
                         font-size:16px !important;
                         line-height:125% !important;
-                    }
+                    }}
 
-                    .rightColumnContent{
+                    .rightColumnContent{{
                         font-size:16px !important;
                         line-height:125% !important;
-                    }
+                    }}
 
-                    h2, h3 {
+                    h2, h3 {{
                         font-size: 100%
-                    }
-                }
-                @media screen and (prefers-color-scheme: dark) {
-                    a {
+                    }}
+                }}
+                @media screen and (prefers-color-scheme: dark) {{
+                    a {{
                         color: #FFFFFF;
-                    }
+                    }}
 
-                    body {
+                    body {{
                         background-color: #2d3239;
-                    }
-                }
+                    }}
+                }}
             </style>
         </head>
         <body>
@@ -68,11 +68,6 @@ html_template = """
                                         <tr>
                                             <td align="center" valign="top" style="width:100%;">
                                                 &nbsp;
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td align="center" valign="top" style="width:100%;">
-                                                <h3 style="margin-top: 0;margin-right: 0;margin-bottom: 10px;margin-left: 0;">{{ service_name }} - {{ frequency.capitalize() }} email ({{ date }})</h3>
                                             </td>
                                         </tr>
                                         <tr>
