@@ -11,29 +11,72 @@ html_template = """
         <head>
             <meta name="viewport" content="width=device-width">
             <meta http-equiv="Content-Type" content="text/html charset=UTF-8" />
+            <style type="text/css">
+                @media only screen and (max-width: 480px){
+                    #templateColumns{
+                        width:100% !important;
+                    }
+
+                    .templateColumnContainer{
+                        display:block !important;
+                        width:100% !important;
+                    }
+
+                    .columnContent{
+                        font-size:16px !important;
+                        line-height:125% !important;
+                    }
+
+                    .leftColumnContent{
+                        font-size:16px !important;
+                        line-height:125% !important;
+                    }
+
+                    .rightColumnContent{
+                        font-size:16px !important;
+                        line-height:125% !important;
+                    }
+
+                    h2, h3 {
+                        font-size: 100%
+                    }
+                }
+                @media screen and (prefers-color-scheme: dark) {
+                    a {
+                        color: #FFFFFF;
+                    }
+
+                    body {
+                        background-color: #2d3239;
+                    }
+                }
+            </style>
         </head>
         <body>
-            <table border="0" cellpadding="0" cellspacing="0" height="100%" width="100%" id="bodyTable" style="background-color: #E0E0E0;">
+            <table border="0" cellpadding="0" cellspacing="0" height="100%" width="100%" id="bodyTable" style="background-color: #FFFFFF;">
                 <tr>
                     <td align="center" valign="top">
-                        <table border="0" cellpadding="10" cellspacing="0" width="600" id="emailContainer">
+                        <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 1024px;" id="emailContainer" >
                             <tr>
-                                <td align="center" valign="top">
-                                    <table border="0" cellpadding="20" cellspacing="0" width="100%" id="emailHeader">
-        
-                                    </table>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td align="center" valign="top">
-                                    <table border="0" cellpadding="20" cellspacing="0" width="100%" id="emailBody" style="background-color: #ffffff;">
+                                <td align="center" valign="top" style="font-family:Arial;">
+                                    <table border="0" cellpadding="0" cellspacing="0" width="100%" id="emailBody" >
                                         <tr>
-                                            <td align="center" valign="top" background="https://ui.adsabs.harvard.edu/styles/img/background.jpg" style="width:100%; background-color: #150E35" >
-                                                <img src="https://ui.adsabs.harvard.edu/styles/img/ads_logo.png" alt="Astrophysics Data System" style="width: 70%; color: #ffffff; font-size: 34px; font-family: sans-serif;"/> 
+                                            <td align="center" valign="top" id="m_4393282051944905389m_-5269006104307297584templateHeader">
+                                                <img src="https://scixplorer.org/styles/img/newsletter-banner.jpg" style="max-width: 100%; height: auto;"/>
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td align="left" valign="top">
+                                            <td align="center" valign="top" style="width:100%;">
+                                                &nbsp;
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td align="center" valign="top" style="width:100%;">
+                                                <h3 style="margin-top: 0;margin-right: 0;margin-bottom: 10px;margin-left: 0;">{{ service_name }} - {{ frequency.capitalize() }} email ({{ date }})</h3>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td align="center" style="width:100%; font-size: 14px; font-family:Arial">
                                                 {msg}
                                             </td>
                                         </tr>
@@ -106,7 +149,7 @@ account associated with this email address. Click the link below to reset it:</p
 class WelcomeVerificationEmail(EmailTemplate):
     msg_plain = """Hi,
 
-Welcome to the new NASA ADS! To finish setting up your account, please confirm your email address by copying and 
+Welcome to the {ui_env}! To finish setting up your account, please confirm your email address by copying and 
 pasting the link below into your browser:
 
 {endpoint}
@@ -120,7 +163,7 @@ If you didn't request this, you can safely ignore this email.
 
     msg = """{open_tag}Hi,</p>
 
-{open_tag}Welcome to the new <a href="https://ui.adsabs.harvard.edu">NASA ADS</a>! To finish setting up your account, 
+{open_tag}Welcome to <a href="{ui_url}">{ui_env}</a>! To finish setting up your account, 
 please confirm your email address:</p>
 
 {open_tag}<a href="{endpoint}">{endpoint}</a></p>
@@ -133,13 +176,13 @@ please confirm your email address:</p>
         open_tag=open_tag, endpoint="""{endpoint}"""
     )
     msg_html = html_template.format(msg=msg, email_address="""{email_address}""")
-    subject = "[ADS] Please verify your email address"
+    subject = "[{ui_env}] Please verify your email address"
 
 
 class VerificationEmail(EmailTemplate):
     msg_plain = """Hi,
 
-You've recently requested to change the email address associated with your NASA ADS account. To confirm this change, 
+You've recently requested to change the email address associated with your {ui_env} account. To confirm this change, 
 please copy and paste the link below into your browser:
 
 {endpoint}
@@ -154,7 +197,7 @@ If you didn't request this, you can safely ignore this email.
     msg = """{open_tag}Hi,</p>
 
 {open_tag}You've recently requested to change the email address associated with your 
-<a href="https://ui.adsabs.harvard.edu">NASA ADS</a> account. To confirm this change, please click the link below:</p>
+<a href="{ui_url}">{ui_env}</a> account. To confirm this change, please click the link below:</p>
 
 {open_tag}<a href="{endpoint}">{endpoint}</a></p>
 
@@ -166,13 +209,13 @@ If you didn't request this, you can safely ignore this email.
         open_tag=open_tag, endpoint="""{endpoint}"""
     )
     msg_html = html_template.format(msg=msg, email_address="""{email_address}""")
-    subject = "[ADS] Please verify your email address"
+    subject = "[{ui_env}] Please verify your email address"
 
 
 class EmailChangedNotification(EmailTemplate):
     msg_plain = """Hi,
 
-You’ve recently requested to change the email address associated with your NASA ADS account.
+You’ve recently requested to change the email address associated with your {ui_env} account.
 
 A verification email has been sent to the new email address. After the new email address has been confirmed, 
 this email address will no longer be associated with your account.
@@ -184,7 +227,7 @@ If you didn't request this, please reply to this email, or contact the support t
     msg = """{open_tag}Hi,</p>
 
 {open_tag}You’ve recently requested to change the email address associated with your 
-<a href="https://ui.adsabs.harvard.edu">NASA ADS</a> account. </p>
+<a href="{ui_url}">NASA ADS</a> account. </p>
 
 {open_tag}A verification email has been sent to the new email address. After the new email address has been confirmed, 
 this email address will no longer be associated with your account.</p>
@@ -197,13 +240,13 @@ this email address will no longer be associated with your account.</p>
     )
 
     msg_html = html_template.format(msg=msg, email_address="""{email_address}""")
-    subject = "[ADS] An email change has been requested"
+    subject = "[{ui_env}] An email change has been requested"
 
 
 class AccountRegistrationAttemptEmail(EmailTemplate):
     msg_plain = """Hi,
 
-We noticed an attempt to register a NASA ADS account using your email address. If this was you, please disregard this message.
+We noticed an attempt to register a {ui_env} account using your email address. If this was you, please disregard this message.
 
 If you did not initiate this registration, please ensure your email account is secure and consider changing your password.
 
@@ -213,7 +256,7 @@ If you have any questions or need further assistance, please reply to this email
 
     msg = """{open_tag}Hi,</p>
 
-{open_tag}We noticed an attempt to register a <a href="https://ui.adsabs.harvard.edu">NASA ADS</a> account associated with this email address. </p>
+{open_tag}We noticed an attempt to register a <a href="{ui_url}">{ui_env}</a> account associated with this email address. </p>
 
 {open_tag}If you did not initiate this registration, please ensure your email account is secure and consider changing your password.</p>
 
@@ -224,4 +267,4 @@ If you have any questions or need further assistance, please reply to this email
         open_tag=open_tag
     )
     msg_html = html_template.format(msg=msg, email_address="""{email_address}""")
-    subject = "[ADS] Account Registration Attempt Notice"
+    subject = "[{ui_env}] Account Registration Attempt Notice"

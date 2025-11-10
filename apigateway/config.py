@@ -6,6 +6,9 @@ DEBUG = True
 # Mail
 MAIL_DEFAULT_SENDER = "no-reply@adslabs.org"
 VERIFY_URL = "https://ui.adsabs.harvard.edu/#user/account/verify"
+SCIX_VERIFY_URL = "https://scixplorer.org/#user/account/verify"
+SCIX_HOST_DOMAIN = "https://scixplorer.org"
+ADS_HOST_DOMAIN = "https://ui.adsabs.harvard.edu"
 
 # Feeback
 FEEDBACK_FORMS_ORIGIN = "user_submission"

@@ -42,6 +42,8 @@ def send_email(
     template: EmailTemplate,
     verification_url: str = "",
     mail_server: str = None,
+    ui_env: str = "ADS",
+    ui_url: str = "https://ui.adsabs.harvard.edu",
 ):
     current_app.logger.info("From send_email: Host header: {}".format(request.headers.get("Host", "No Host Specified")))
 
@@ -69,7 +71,7 @@ def send_email(
     message["Subject"] = template.subject
     message["From"] = sender
     message["To"] = recipient
-    message.set_content(template.msg_plain.format(endpoint=verification_url))
+    message.set_content(template.msg_plain.format(endpoint=verification_url, ui_env=ui_env, ui_url=ui_url))
     message.add_alternative(
         template.msg_html.format(endpoint=verification_url, email_address=recipient),
         subtype="html",
