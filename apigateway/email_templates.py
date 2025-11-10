@@ -130,7 +130,7 @@ If you didn't request this, you can safely ignore this email.
     """
     msg = """{open_tag}Hi,</p>
 
-{open_tag}You've recently requested to reset your password for the <a href="https://ui.adsabs.harvard.edu">NASA ADS</a> 
+{open_tag}You've recently requested to reset your password for the <a href="{ui_url}">{ui_env}</a> 
 account associated with this email address. Click the link below to reset it:</p>
 
 {open_tag}<a href="{endpoint}">{endpoint}</a></p>
@@ -140,7 +140,7 @@ account associated with this email address. Click the link below to reset it:</p
 {open_tag}If you didn't request this, you can safely ignore this email.</p>
 
 {open_tag}- the ADS team</p>""".format(
-        open_tag=open_tag, endpoint="""{endpoint}"""
+        open_tag=open_tag, endpoint="""{endpoint}""",ui_url="""{ui_url}""",ui_env="""{ui_env}"""
     )
     msg_html = html_template.format(msg=msg, email_address="""{email_address}""")
     subject = "[ADS] Password reset"
@@ -173,7 +173,7 @@ please confirm your email address:</p>
 {open_tag}If you didn't request this, you can safely ignore this email.</p>
 
 {open_tag}- the ADS team</p>""".format(
-        open_tag=open_tag, endpoint="""{endpoint}"""
+        open_tag=open_tag, endpoint="""{endpoint}""", ui_url="""{ui_url}""", ui_env="""{ui_env}"""
     )
     msg_html = html_template.format(msg=msg, email_address="""{email_address}""")
     subject = "[{ui_env}] Please verify your email address"
@@ -206,7 +206,7 @@ If you didn't request this, you can safely ignore this email.
 {open_tag}If you didn't request this, you can safely ignore this email.</p>
 
 {open_tag}- the ADS team</p>""".format(
-        open_tag=open_tag, endpoint="""{endpoint}"""
+        open_tag=open_tag, endpoint="""{endpoint}""", ui_url="""{ui_url}""", ui_env="""{ui_env}"""
     )
     msg_html = html_template.format(msg=msg, email_address="""{email_address}""")
     subject = "[{ui_env}] Please verify your email address"
@@ -227,7 +227,7 @@ If you didn't request this, please reply to this email, or contact the support t
     msg = """{open_tag}Hi,</p>
 
 {open_tag}You’ve recently requested to change the email address associated with your 
-<a href="{ui_url}">NASA ADS</a> account. </p>
+<a href="{ui_url}">{ui_env}</a> account. </p>
 
 {open_tag}A verification email has been sent to the new email address. After the new email address has been confirmed, 
 this email address will no longer be associated with your account.</p>
@@ -236,7 +236,7 @@ this email address will no longer be associated with your account.</p>
 <a href="mailto:adshelp@cfa.harvard.edu">support team</a> directly.</p>
 
 {open_tag}- the ADS team</p> """.format(
-        open_tag=open_tag
+        open_tag=open_tag, ui_url="""{ui_url}""", ui_env="""{ui_env}"""
     )
 
     msg_html = html_template.format(msg=msg, email_address="""{email_address}""")
@@ -264,7 +264,7 @@ If you have any questions or need further assistance, please reply to this email
 
 
 {open_tag}- the ADS team</p>""".format(
-        open_tag=open_tag
+        open_tag=open_tag, ui_url="""{ui_url}""", ui_env="""{ui_env}"""
     )
     msg_html = html_template.format(msg=msg, email_address="""{email_address}""")
     subject = "[{ui_env}] Account Registration Attempt Notice"
