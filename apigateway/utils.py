@@ -68,7 +68,7 @@ def send_email(
         mail_server = current_app.config.get("MAIL_SERVER", "localhost")
 
     message = EmailMessage()
-    message["Subject"] = template.format(ui_env=ui_env)
+    message["Subject"] = template.subject.format(ui_env=ui_env)
     message["From"] = sender
     message["To"] = recipient
     message.set_content(template.msg_plain.format(endpoint=verification_url, ui_env=ui_env, ui_url=ui_url))
