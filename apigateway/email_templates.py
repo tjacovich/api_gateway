@@ -301,6 +301,8 @@ We noticed an attempt to register a {ui_env} account using your email address. I
 
 If you did not initiate this registration, please ensure your email account is secure and consider changing your password.
 
+If you are an existing ADS user attempting to use SciX, please know that ADS and SciX share the same backend so your existing ADS account and password will also work on SciX.
+
 If you have any questions or need further assistance, please reply to this email, or contact the support team at adshelp@cfa.harvard.edu directly.
 
 - the ADS team"""
@@ -310,6 +312,8 @@ If you have any questions or need further assistance, please reply to this email
 {open_tag}We noticed an attempt to register a <a href="{ui_url}">{ui_env}</a> account associated with this email address. </p>
 
 {open_tag}If you did not initiate this registration, please ensure your email account is secure and consider changing your password.</p>
+
+{open_tag}If you are an existing ADS user attempting to use SciX, please know that ADS and SciX share the same backend so your existing ADS account and password will also work on SciX.</p>
 
 {open_tag}If you have any questions or need further assistance, please reply to this email, or contact the <a href="mailto:adshelp@cfa.harvard.edu">support team</a> directly.</p>
 
