@@ -362,9 +362,9 @@ def send_account_registration_attempt_email(email: str):
     if "scixplorer" in request.headers.get("Host", ""):
             ui_env = "SciX"
             ui_url = current_app.config.get("SCIX_HOST_DOMAIN", "dev.scixplorer.org")
-        else:
-            ui_env = "ADS"
-            ui_url = current_app.config.get("ADS_HOST_DOMAIN", "dev.adsabs.harvard.edu")
+    else:
+        ui_env = "ADS"
+        ui_url = current_app.config.get("ADS_HOST_DOMAIN", "dev.adsabs.harvard.edu")
     send_email(
         sender=current_app.config["MAIL_DEFAULT_SENDER"],
         recipient=email,
