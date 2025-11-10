@@ -194,7 +194,7 @@ account associated with this email address. Click the link below to reset it:</p
         open_tag=open_tag, endpoint="""{endpoint}""",ui_url="""{ui_url}""",ui_env="""{ui_env}"""
     )
     msg_html = html_template.format(msg=msg, email_address="""{email_address}""")
-    subject = "[ADS] Password reset"
+    subject = "[{ui_env}] Password reset"
 
 
 class WelcomeVerificationEmail(EmailTemplate):

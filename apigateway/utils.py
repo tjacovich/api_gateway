@@ -321,28 +321,54 @@ def make_json_diff(original: str, updated: str):
 
 
 def send_password_reset_email(token: str, email: str):
-    verification_url = f"{current_app.config['VERIFY_URL']}/reset-password/{token}"
+    if "scixplorer" in request.headers.get("Host", ""):
+        ui_env = "SciX"
+        ui_url = current_app.config.get("SCIX_HOST_DOMAIN", "dev.scixplorer.org")
+        verification_url = f"{current_app.config['SCIX_VERIFY_URL']}/change-email/{token}"
+    else:
+        ui_env = "ADS"
+        ui_url = current_app.config.get("ADS_HOST_DOMAIN", "dev.adsabs.harvard.edu")
+        verification_url = f"{current_app.config['VERIFY_URL']}/change-email/{token}"    
     send_email(
         sender=current_app.config["MAIL_DEFAULT_SENDER"],
         recipient=email,
         template=PasswordResetEmail,
         verification_url=verification_url,
+        ui_env=ui_env,
+        ui_url=ui_url,
     )
 
 
 def send_welcome_email(token: str, email: str):
-    verification_url = f"{current_app.config['VERIFY_URL']}/register/{token}"
+    if "scixplorer" in request.headers.get("Host", ""):
+        ui_env = "SciX"
+        ui_url = current_app.config.get("SCIX_HOST_DOMAIN", "dev.scixplorer.org")
+        verification_url = f"{current_app.config['SCIX_VERIFY_URL']}/change-email/{token}"
+    else:
+        ui_env = "ADS"
+        ui_url = current_app.config.get("ADS_HOST_DOMAIN", "dev.adsabs.harvard.edu")
+        verification_url = f"{current_app.config['VERIFY_URL']}/change-email/{token}"
     send_email(
         sender=current_app.config["MAIL_DEFAULT_SENDER"],
         recipient=email,
         template=WelcomeVerificationEmail,
         verification_url=verification_url,
+        ui_env=ui_env,
+        ui_url=ui_url,
     )
 
 
 def send_account_registration_attempt_email(email: str):
+    if "scixplorer" in request.headers.get("Host", ""):
+            ui_env = "SciX"
+            ui_url = current_app.config.get("SCIX_HOST_DOMAIN", "dev.scixplorer.org")
+        else:
+            ui_env = "ADS"
+            ui_url = current_app.config.get("ADS_HOST_DOMAIN", "dev.adsabs.harvard.edu")
     send_email(
         sender=current_app.config["MAIL_DEFAULT_SENDER"],
         recipient=email,
         template=AccountRegistrationAttemptEmail,
+        ui_env=ui_env,
+        ui_url=ui_url,
     )
