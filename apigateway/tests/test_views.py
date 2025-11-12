@@ -432,9 +432,11 @@ class TestChangeEmailView:
                 "new_email@gmail.com",
                 VerificationEmail,
                 verification_url=mock.ANY,
+                ui_env=mock.ANY,
+                ui_url=mock.ANY,
             )
             send_email_mock.assert_any_call(
-                app.config["MAIL_DEFAULT_SENDER"], old_email, EmailChangedNotification
+                app.config["MAIL_DEFAULT_SENDER"], old_email, EmailChangedNotification, ui_env=mock.ANY, ui_url=mock.ANY,
             )
 
     def test_post_change_email_incorrect_password(

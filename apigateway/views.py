@@ -371,7 +371,6 @@ class ChangeEmailView(Resource):
 
             self._delete_existing_email_change_requests(session)
             self._create_email_change_request(session, token, params.email)
-
             # Verify new email address
             self._send_verification_email(token, params.email)
 
