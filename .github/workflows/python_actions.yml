@@ -62,7 +62,7 @@ jobs:
 
     - name: Install dependencies
       run: |
-        pip install setuptools==57.5.0 wheel psycopg2
+        pip install setuptools==57.0.0 wheel psycopg2 pip==24.0
         pip install .
         pip install -e '.[dev]'
 
