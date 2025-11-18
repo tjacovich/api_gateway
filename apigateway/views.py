@@ -371,7 +371,6 @@ class ChangeEmailView(Resource):
 
             self._delete_existing_email_change_requests(session)
             self._create_email_change_request(session, token, params.email)
-
             # Verify new email address
             self._send_verification_email(token, params.email)
 
@@ -399,20 +398,38 @@ class ChangeEmailView(Resource):
         return session.query(User).filter_by(email=email).first() is not None
 
     def _send_verification_email(self, token, new_email: str):
-        verification_url = f"{current_app.config['VERIFY_URL']}/change-email/{token}"
+        if "scixplorer" in request.headers.get("Host", ""):
+            ui_env = "SciX"
+            ui_url = current_app.config.get("SCIX_HOST_DOMAIN", "dev.scixplorer.org")
+            verification_url = f"{current_app.config['SCIX_VERIFY_URL']}/change-email/{token}"
+        else:
+            ui_env = "ADS"
+            ui_url = current_app.config.get("ADS_HOST_DOMAIN", "dev.adsabs.harvard.edu")
+            verification_url = f"{current_app.config['VERIFY_URL']}/change-email/{token}"            
+
 
         send_email(
             current_app.config["MAIL_DEFAULT_SENDER"],
             new_email,
             templates.VerificationEmail,
             verification_url=verification_url,
+            ui_url=ui_url,
+            ui_env=ui_env,
         )
 
     def _send_notify_email_change(self):
+        if "scixplorer" in request.headers.get("Host", ""):
+            ui_env = "SciX"
+            ui_url = current_app.config.get("SCIX_HOST_DOMAIN", "dev.scixplorer.org")
+        else:
+            ui_env = "ADS"
+            ui_url = current_app.config.get("ADS_HOST_DOMAIN", "dev.adsabs.harvard.edu")
         send_email(
             current_app.config["MAIL_DEFAULT_SENDER"],
             current_user.email,
             templates.EmailChangedNotification,
+            ui_url=ui_url,
+            ui_env=ui_env,
         )
 
 

@@ -422,7 +422,7 @@ class TestChangeEmailView:
     def test_post_change_email(self, app, change_email_view, authenticated_user, send_email_mock):
         old_email = authenticated_user.email
         with app.test_request_context(
-            json={"password": "Valid_password1", "email": "new_email@gmail.com"}
+            json={"password": "Valid_password1", "email": "new_email@gmail.com"},
         ):
             login_user(authenticated_user)
             _, status_code = change_email_view.post()
@@ -432,9 +432,32 @@ class TestChangeEmailView:
                 "new_email@gmail.com",
                 VerificationEmail,
                 verification_url=mock.ANY,
+                ui_env="ADS",
+                ui_url="https://ui.adsabs.harvard.edu",
             )
             send_email_mock.assert_any_call(
-                app.config["MAIL_DEFAULT_SENDER"], old_email, EmailChangedNotification
+                app.config["MAIL_DEFAULT_SENDER"], old_email, EmailChangedNotification, ui_env=mock.ANY, ui_url=mock.ANY,
+            )
+
+    def test_post_change_email_scix(self, app, change_email_view, authenticated_user, send_email_mock):
+        old_email = authenticated_user.email
+        with app.test_request_context(
+            json={"password": "Valid_password1", "email": "new_email@gmail.com"},
+            headers={"Host":"https://scixplorer.org"}
+        ):
+            login_user(authenticated_user)
+            _, status_code = change_email_view.post()
+            assert status_code == 200
+            send_email_mock.assert_any_call(
+                app.config["MAIL_DEFAULT_SENDER"],
+                "new_email@gmail.com",
+                VerificationEmail,
+                verification_url=mock.ANY,
+                ui_env="SciX",
+                ui_url="https://scixplorer.org",
+            )
+            send_email_mock.assert_any_call(
+                app.config["MAIL_DEFAULT_SENDER"], old_email, EmailChangedNotification, ui_env=mock.ANY, ui_url=mock.ANY,
             )
 
     def test_post_change_email_incorrect_password(
