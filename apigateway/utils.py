@@ -108,7 +108,7 @@ def send_feedback_email(
 
     message = EmailMessage()
     message["Subject"] = f"{subject} from {submitter_name} ({submitter_email})"
-    message["From"] = f"ADS Administation <{default_email}>"
+    message["From"] = f"ADS Administration <{default_email}>"
     message["To"] = recipient
     message["reply-to"] = f"{submitter_name} <{submitter_email}>"
     message.set_content(body)
