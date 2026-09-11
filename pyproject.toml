@@ -37,9 +37,8 @@ dependencies = [
     'opentelemetry-instrumentation-flask==0.51b0',
     'opentelemetry-sdk==1.30.0',
     'opentelemetry-exporter-otlp==1.30.0',
-    'opentelemetry-instrumentation-sqlalchemy==0.51b0'
-
-
+    'opentelemetry-instrumentation-sqlalchemy==0.51b0',
+    'disposable-email-domains==0.0.256'
 ]
 
 [project.urls]
