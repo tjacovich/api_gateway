@@ -258,6 +258,13 @@ class TestUserManagementView:
             with pytest.raises(ValidationError):
                 user_management_view.post()
 
+    def test_post_new_user_disposable_email(self, app, user_management_view, new_user_data):
+        new_user_data["email"] = "test@0-mail.com"
+        app.config["BLOCK_DISPOSABLE_EMAIL_DOMAINS"] = True
+        with app.test_request_context(json=new_user_data):
+            with pytest.raises(ValueError):
+                user_management_view.post()
+
     def test_post_existing_user(self, app, user_management_view, authenticated_user):
         existing_user = {
             "given_name": "Test",

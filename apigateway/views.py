@@ -224,8 +224,8 @@ class UserManagementView(Resource):
             if current_app.config.get("BLOCK_DISPOSABLE_EMAIL_DOMAINS", False):
                 email_domain = params.email.split('@')[1]
                 if email_domain in blocklist:
-                    current_app.logger.warning("User {} attempting to register with blocked email domain.".format(params.email))
-                    raise ValueError("Invalid email domain: {}. We do not allow account registration with temporary email services.".format(email_domain))
+                    current_app.logger.warning("User {} attempting to register with disposable email domain.".format(params.email))
+                    raise ValueError("Invalid email domain: {}. Account registration with disposable email services is not allowed.".format(email_domain))
             
             user: User = extensions.security_service.create_user(
                 given_name=params.given_name,
