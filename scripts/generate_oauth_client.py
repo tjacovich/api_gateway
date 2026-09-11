@@ -102,17 +102,27 @@ def get_token():
         
         
         try:
-            client = db.session.query(OAuth2Client).filter_by(user_id=u.get_id(), name=args.name).one()
+            client = None
+            clients = db.session.query(OAuth2Client).filter_by(user_id=u.get_id())
+            for potential_client in clients:
+                if potential_client.client_metadata.get('client_name')==args.name and not client:
+                    client = potential_client
+                elif client:
+                    raise MultipleResultsFound
+            if not client:
+                raise NoResultFound
+            
         except MultipleResultsFound:
             raise DatabaseIntegrityError("Multiple oauthclients found for that user and name.")
+        
         except NoResultFound:
-            
             client = OAuth2Client(
                         user_id=u.get_id(),
                         ratelimit_multiplier=1.0,
                         individual_ratelimit_multipliers=None,
                         last_activity=datetime.datetime.now(),
                     )
+            
             client.set_client_metadata(
                 {
                     "client_name": args.name,
