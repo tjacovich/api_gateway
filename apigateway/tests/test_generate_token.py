@@ -12,13 +12,12 @@ def test_get_token_existing_user_existing_client(mock_add_arguments, app, mock_r
             # Mock user
             MagicMock(filter_by=MagicMock(return_value=MagicMock(one=MagicMock(return_value=mock_regular_user)))),
             # Mock client
-            MagicMock(filter_by=MagicMock(return_value=MagicMock(one=MagicMock(return_value=mock_client)))),
+            MagicMock(filter_by=MagicMock(return_value=MagicMock(all=MagicMock(return_value=[mock_client])))),
             # Mock tokens list
             MagicMock(filter_by=MagicMock(return_value=MagicMock(all=MagicMock(return_value=[mock_simple_token])))),
         ]
-        
-        result = get_token()
 
+        result = get_token()
         assert result['access_token'] == "access_token"
         assert result['refresh_token'] == "refresh_token"
         assert str(result['username']) == "test@gmail.com"

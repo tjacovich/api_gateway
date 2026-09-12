@@ -97,13 +97,11 @@ def get_token():
             db.session.add(u)
             db.session.commit()
         except MultipleResultsFound:
-        
             raise DatabaseIntegrityError
-        
-        
+         
         try:
             client = None
-            clients = db.session.query(OAuth2Client).filter_by(user_id=u.get_id())
+            clients = db.session.query(OAuth2Client).filter_by(user_id=u.get_id()).all()
             for potential_client in clients:
                 if potential_client.client_metadata.get('client_name')==args.name and not client:
                     client = potential_client

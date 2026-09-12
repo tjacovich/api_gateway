@@ -9,7 +9,7 @@ VERIFY_URL = "https://ui.adsabs.harvard.edu/#user/account/verify"
 SCIX_VERIFY_URL = "https://scixplorer.org/#user/account/verify"
 SCIX_HOST_DOMAIN = "https://scixplorer.org"
 ADS_HOST_DOMAIN = "https://ui.adsabs.harvard.edu"
-BLOCK_DISPOSABLE_EMAIL_DOMAINS = False
+BLOCK_DISPOSABLE_EMAIL_DOMAINS = True
 
 # Feeback
 FEEDBACK_FORMS_ORIGIN = "user_submission"
